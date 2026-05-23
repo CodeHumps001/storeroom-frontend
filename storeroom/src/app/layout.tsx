@@ -5,90 +5,93 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("storeroom-in.vercel.app"),
+  metadataBase: new URL("https://storeroom-in.vercel.app"),
 
   title: {
-    default: "Storeroom - Smart Inventory & POS Management System",
+    default: "Storeroom — Smart Inventory & POS Management System",
     template: "%s | Storeroom",
   },
 
   description:
-    "Storeroom is a modern inventory and POS management system that helps businesses manage products, sales, barcode scanning, receipts, stock tracking, staff, and analytics in real time.",
+    "Storeroom is a modern inventory and POS management platform built for businesses to manage products, stock, barcode scanning, sales, receipts, staff, and analytics in real time. Track inventory efficiently, generate PDF receipts, monitor low stock items, and streamline business operations from one powerful dashboard.",
 
   keywords: [
-    "Inventory Management System",
-    "POS System",
-    "Store Management Software",
-    "Inventory Tracking Software",
-    "Barcode Inventory System",
-    "Retail POS Software",
-    "Stock Management App",
-    "Sales Management System",
-    "Receipt Generator",
-    "Business Management Software",
-    "Warehouse Management System",
-    "Multi Tenant SaaS",
-    "Inventory Software Ghana",
-    "Retail Management Platform",
-    "Product Inventory Tracking",
-    "Smart Inventory Solution",
-    "Cloud POS System",
-    "Small Business Inventory App",
-    "Real Time Inventory Tracking",
-    "Barcode Scanner POS",
+    "Storeroom",
+    "inventory management system",
+    "POS software",
+    "store management system",
+    "inventory tracking software",
+    "barcode inventory system",
+    "stock management app",
+    "sales management software",
+    "retail management platform",
+    "inventory dashboard",
+    "barcode scanner POS",
+    "cloud inventory software",
+    "business management software",
+    "real time inventory tracking",
+    "receipt generation software",
+    "small business inventory app",
+    "warehouse management system",
+    "retail POS system",
+    "inventory software Ghana",
+    "multi tenant SaaS",
   ],
 
   authors: [
     {
-      name: "Storeroom",
+      name: "Fosu Yaw Humphrey",
+      url: "https://storeroom-in.vercel.app",
     },
   ],
 
-  creator: "Storeroom",
+  creator: "Fosu Yaw Humphrey",
 
-  publisher: "Storeroom",
+  publisher: "Velux Corporation",
 
   category: "Business Software",
 
   applicationName: "Storeroom",
 
   alternates: {
-    canonical: "https://storeroom.app",
+    canonical: "https://storeroom-in.vercel.app",
   },
 
   openGraph: {
-    title: "Storeroom - Smart Inventory & POS Management System",
+    type: "website",
 
-    description:
-      "Manage products, inventory, sales, barcode scanning, PDF receipts, staff, and reports with Storeroom business software.",
+    locale: "en_US",
 
-    url: "storeroom-in.vercel.app",
+    url: "https://storeroom-in.vercel.app",
 
     siteName: "Storeroom",
+
+    title: "Storeroom — Smart Inventory & POS Management System",
+
+    description:
+      "Manage products, inventory, barcode scanning, sales, receipts, staff, and analytics with Storeroom business software.",
 
     images: [
       {
         url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "Storeroom Inventory Management System",
+        alt: "Storeroom Inventory Management Platform",
       },
     ],
-
-    locale: "en_US",
-
-    type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
 
-    title: "Storeroom - Inventory & POS Software",
+    title: "Storeroom — Smart Inventory & POS System",
 
     description:
-      "Modern inventory and POS software for managing products, sales, barcode scanning, reports, and stock tracking.",
+      "Modern inventory and POS software for managing products, stock, barcode scanning, receipts, and business analytics.",
 
     images: ["/logo.png"],
+
+    creator: "@YawFosu869776",
   },
 
   robots: {
@@ -108,6 +111,10 @@ export const metadata: Metadata = {
     icon: "/logo.png",
     shortcut: "/logo.png",
     apple: "/logo.png",
+  },
+
+  verification: {
+    google: "googlebce795757b0ef5e3",
   },
 };
 
