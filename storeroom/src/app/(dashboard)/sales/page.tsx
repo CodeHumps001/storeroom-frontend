@@ -91,9 +91,19 @@ export default function SalesPage() {
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
+
+      // Create download link
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt-${saleId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showToast("success", "Receipt downloaded! Check your downloads folder.");
     } catch (err: any) {
-      showToast("error", err.message || "Failed to open receipt");
+      showToast("error", err.message || "Failed to generate receipt");
     }
   };
 
