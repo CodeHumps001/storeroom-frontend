@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 
 import { getToken } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMe } from "@/hooks/Useme";
 import Sidebar from "@/components/shared/sidebar";
 
 const pageTitles: Record<string, string> = {
@@ -18,6 +19,15 @@ const pageTitles: Record<string, string> = {
   "/settings": "Settings",
 };
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 export default function DashboardLayout({
   children,
 }: {
@@ -27,17 +37,16 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const token = getToken();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { me } = useMe();
 
   useEffect(() => {
     if (!token) router.push("/login");
   }, [token]);
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname]);
 
-  // Lock body scroll when mobile sidebar is open
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
     return () => {
@@ -59,7 +68,7 @@ export default function DashboardLayout({
         />
       )}
 
-      {/* Sidebar — fixed on mobile, static on desktop */}
+      {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 w-64 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -72,7 +81,6 @@ export default function DashboardLayout({
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top bar */}
         <header className="flex h-16 shrink-0 items-center gap-4 border-b border-zinc-200 bg-white px-4 md:px-6 dark:border-zinc-800 dark:bg-zinc-950">
-          {/* Hamburger — mobile only */}
           <Button
             variant="ghost"
             size="icon"
@@ -83,16 +91,40 @@ export default function DashboardLayout({
             <Menu className="h-5 w-5" />
           </Button>
 
-          {/* Page title */}
           <h2 className="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100">
             {pageTitle}
           </h2>
 
-          {/* Right side — placeholder for TopBar additions (user/org info) */}
           <div className="ml-auto flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">
-              YA
-            </div>
+            {me && (
+              <>
+                {/* Org name */}
+                <div className="hidden items-center gap-1.5 sm:flex">
+                  <Building2 className="h-3.5 w-3.5 text-zinc-400" />
+                  <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                    {me.organization.organizationName}
+                  </span>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden h-4 w-px bg-zinc-200 dark:bg-zinc-700 sm:block" />
+
+                {/* User info + avatar */}
+                <div className="flex items-center gap-2.5">
+                  <div className="hidden text-right sm:block">
+                    <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                      {me.name}
+                    </p>
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                      {me.role}
+                    </p>
+                  </div>
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white">
+                    {getInitials(me.name)}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
