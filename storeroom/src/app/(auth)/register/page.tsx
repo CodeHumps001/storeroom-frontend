@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -166,11 +167,19 @@ export default function RegisterPage() {
 
           <div className="relative flex flex-1 flex-col justify-between p-14">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-sm font-bold text-white dark:bg-white dark:text-black">
-                IP
+              <div className="relative h-12 w-12 overflow-hidden rounded-2xl">
+                <Image
+                  src="/logo.png"
+                  alt="Storeroom Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight">Storeroom</h1>
+                <h1 className="text-xl font-bold tracking-tight">
+                  <span className="text-black dark:text-white">Store</span>
+                  <span className="text-orange-500">room</span>
+                </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Smart Inventory Management
                 </p>
@@ -183,7 +192,7 @@ export default function RegisterPage() {
               </div>
               <h2 className="text-5xl font-black leading-[1.1] tracking-tight">
                 Get started with
-                <span className="text-orange-500"> InventoryPro</span>
+                <span className="text-orange-500"> Storeroom</span>
               </h2>
               <p className="mt-6 max-w-md text-base text-zinc-600 dark:text-zinc-400">
                 Join thousands of businesses managing their inventory
@@ -203,12 +212,20 @@ export default function RegisterPage() {
         <section className="flex items-center justify-center bg-white p-4 sm:p-6 dark:bg-black">
           <div className="w-full max-w-md">
             {/* Mobile Logo */}
-            <div className="mb-6 flex items-center justify-center gap-3 lg:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-black text-sm font-bold text-white dark:bg-white dark:text-black">
-                IP
+            <div className="mb-6 flex items-center justify-start gap-3 lg:hidden">
+              <div className="relative h-10 w-10 overflow-hidden rounded-xl">
+                <Image
+                  src="/logo.png"
+                  alt="Storeroom Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div>
-                <h1 className="text-lg font-bold">Storeroom</h1>
+                <h1 className="text-lg font-bold">
+                  <span className="text-black dark:text-white">Store</span>
+                  <span className="text-orange-500">room</span>
+                </h1>
                 <p className="text-xs text-zinc-500">Create Account</p>
               </div>
             </div>

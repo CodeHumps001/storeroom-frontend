@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>("");
@@ -50,28 +51,19 @@ export default function LoginPage() {
           <div className="relative flex flex-1 flex-col justify-between p-14">
             {/* LOGO */}
             <div className="flex items-center gap-3">
-              <div
-                className="
-                  flex
-                  h-12
-                  w-12
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-black
-                  text-sm
-                  font-bold
-                  text-white
-                  dark:bg-white
-                  dark:text-black
-                "
-              >
-                IP
+              <div className="relative h-12 w-12 overflow-hidden rounded-2xl">
+                <Image
+                  src="/logo.png"
+                  alt="Storeroom Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
-
               <div>
-                <h1 className="text-xl font-bold tracking-tight">Storeroom</h1>
-
+                <h1 className="text-xl font-bold tracking-tight">
+                  <span className="text-black dark:text-white">Store</span>
+                  <span className="text-orange-500">room</span>
+                </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Smart Inventory Management
                 </p>
@@ -82,31 +74,31 @@ export default function LoginPage() {
             <div className="max-w-xl">
               <div
                 className="
-                  mb-6
-                  inline-flex
-                  items-center
-                  rounded-full
-                  border
-                  border-orange-500/20
-                  bg-orange-500/10
-                  px-4
-                  py-2
-                  text-sm
-                  font-medium
-                  text-orange-600
-                  dark:text-orange-400
-                "
+        mb-6
+        inline-flex
+        items-center
+        rounded-full
+        border
+        border-orange-500/20
+        bg-orange-500/10
+        px-4
+        py-2
+        text-sm
+        font-medium
+        text-orange-600
+        dark:text-orange-400
+      "
               >
                 Modern SaaS Inventory Platform
               </div>
 
               <h2
                 className="
-                  text-6xl
-                  font-black
-                  leading-[1]
-                  tracking-tight
-                "
+        text-6xl
+        font-black
+        leading-[1]
+        tracking-tight
+      "
               >
                 Manage your
                 <span className="text-orange-500"> business </span>
@@ -115,13 +107,13 @@ export default function LoginPage() {
 
               <p
                 className="
-                  mt-8
-                  max-w-md
-                  text-lg
-                  leading-relaxed
-                  text-zinc-600
-                  dark:text-zinc-400
-                "
+        mt-8
+        max-w-md
+        text-lg
+        leading-relaxed
+        text-zinc-600
+        dark:text-zinc-400
+      "
               >
                 Track products, monitor sales, manage stock levels, and organize
                 your operations from one powerful dashboard.
@@ -133,9 +125,7 @@ export default function LoginPage() {
               <p className="text-zinc-500 dark:text-zinc-400">
                 Real-time Tracking
               </p>
-
               <p className="text-zinc-500 dark:text-zinc-400">Secure Access</p>
-
               <p className="text-zinc-500 dark:text-zinc-400">
                 Analytics Dashboard
               </p>
@@ -157,28 +147,19 @@ export default function LoginPage() {
           <div className="w-full max-w-md">
             {/* MOBILE LOGO */}
             <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <div
-                className="
-                  flex
-                  h-11
-                  w-11
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-black
-                  text-sm
-                  font-bold
-                  text-white
-                  dark:bg-white
-                  dark:text-black
-                "
-              >
-                IP
+              <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
+                <Image
+                  src="/logo.png"
+                  alt="Storeroom Logo"
+                  fill
+                  className="object-cover"
+                />
               </div>
-
               <div>
-                <h1 className="text-lg font-bold">Storeroom</h1>
-
+                <h1 className="text-lg font-bold">
+                  <span className="text-black dark:text-white">Store</span>
+                  <span className="text-orange-500">room</span>
+                </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Inventory Management
                 </p>
