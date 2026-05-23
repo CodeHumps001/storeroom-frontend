@@ -3,9 +3,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${API_URL}${endpoint}`;
   const token = localStorage.getItem("token");
+  const isFormData = options.body instanceof FormData;
 
   options.headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...options.headers,
   };
 
