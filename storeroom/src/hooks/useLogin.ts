@@ -20,7 +20,13 @@ export const useLogin = () => {
       //    - saves the token
       saveToken(response.token);
       //    - redirects to /products
-      router.push("/products");
+      // Role-based redirect
+      const role = response.data.role;
+      if (role === "CASHIER") {
+        router.push("/pos");
+      } else {
+        router.push("/products");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {

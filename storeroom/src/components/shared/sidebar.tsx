@@ -14,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { deleteToken } from "@/lib/auth";
+import Image from "next/image";
 
 interface NavItem {
   href: string;
@@ -47,13 +48,19 @@ export default function Sidebar({ onClose }: SidebarProps) {
   return (
     <aside className="flex h-full flex-col border-r border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b border-zinc-100 px-5 dark:border-zinc-800">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-xs font-bold text-white dark:bg-white dark:text-black">
-            SR
+      <div className="flex h-16 items-center justify-between border-b border-zinc-100 px-2 dark:border-zinc-800">
+        <div className="flex items-center justify-start ">
+          <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+            <Image
+              src="/logo.png"
+              alt="Storeroom Logo"
+              fill
+              className="object-cover"
+            />
           </div>
-          <span className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-            Storeroom
+          <span className="text-[20px] font-bold tracking-tight">
+            <span className="text-black dark:text-white">Store</span>
+            <span className="text-orange-500 dark:text-orange-400">room</span>
           </span>
         </div>
         {onClose && (

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { getToken } from "@/lib/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { Menu, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useMe } from "@/hooks/Useme";
+
 import Sidebar from "@/components/shared/sidebar";
+import { useMe } from "@/hooks/Useme";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -35,13 +35,18 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const token = getToken();
+  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { me } = useMe();
 
+  // Hydration fix — only run client-side
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
+    if (!mounted) return;
+    const token = getToken();
     if (!token) router.push("/login");
-  }, [token]);
+  }, [mounted]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -54,6 +59,10 @@ export default function DashboardLayout({
     };
   }, [sidebarOpen]);
 
+  // Don't render until client hydration is complete
+  if (!mounted) return null;
+
+  const token = getToken();
   if (!token) return null;
 
   const pageTitle = pageTitles[pathname] ?? "Storeroom";
@@ -98,7 +107,6 @@ export default function DashboardLayout({
           <div className="ml-auto flex items-center gap-3">
             {me && (
               <>
-                {/* Org name */}
                 <div className="hidden items-center gap-1.5 sm:flex">
                   <Building2 className="h-3.5 w-3.5 text-zinc-400" />
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
@@ -106,10 +114,8 @@ export default function DashboardLayout({
                   </span>
                 </div>
 
-                {/* Divider */}
                 <div className="hidden h-4 w-px bg-zinc-200 dark:bg-zinc-700 sm:block" />
 
-                {/* User info + avatar */}
                 <div className="flex items-center gap-2.5">
                   <div className="hidden text-right sm:block">
                     <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200">
