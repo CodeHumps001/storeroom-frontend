@@ -1,8 +1,20 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
+
+// Premium, clean fonts tailored for SaaS, inventory dashboards, and POS systems
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://storeroom-in.vercel.app"),
@@ -46,11 +58,8 @@ export const metadata: Metadata = {
   ],
 
   creator: "Fosu Yaw Humphrey",
-
   publisher: "Velux Corporation",
-
   category: "Business Software",
-
   applicationName: "Storeroom",
 
   alternates: {
@@ -59,18 +68,12 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: "website",
-
     locale: "en_US",
-
     url: "https://storeroom-in.vercel.app",
-
     siteName: "Storeroom",
-
     title: "Storeroom — Smart Inventory & POS Management System",
-
     description:
       "Manage products, inventory, barcode scanning, sales, receipts, staff, and analytics with Storeroom business software.",
-
     images: [
       {
         url: "/logo.png",
@@ -83,21 +86,16 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-
     title: "Storeroom — Smart Inventory & POS System",
-
     description:
       "Modern inventory and POS software for managing products, stock, barcode scanning, receipts, and business analytics.",
-
     images: ["/logo.png"],
-
     creator: "@YawFosu869776",
   },
 
   robots: {
     index: true,
     follow: true,
-
     googleBot: {
       index: true,
       follow: true,
@@ -126,10 +124,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
+      className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-screen bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
         <Providers>{children}</Providers>
       </body>
     </html>
