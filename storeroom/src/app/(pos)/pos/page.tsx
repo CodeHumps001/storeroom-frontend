@@ -23,9 +23,7 @@ import {
 import Link from "next/link";
 import apiRequest from "@/lib/api";
 import { useProducts } from "@/hooks/useProducts";
-
 import { getToken } from "@/lib/auth";
-
 import { Product } from "@/types";
 import { useMe } from "@/hooks/Useme";
 import ProductGrid from "@/components/pos/ProductGrid";
@@ -72,6 +70,9 @@ export default function POSPage() {
   const [toast, setToast] = useState<Toast>(null);
   const [showReceipt, setShowReceipt] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [receiptTimeout, setReceiptTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
 
   const isImageMode = me?.organization?.organizationType
     ? IMAGE_BASED_TYPES.includes(me.organization.organizationType)
@@ -128,6 +129,45 @@ export default function POSPage() {
     setAmountPaid("");
   };
 
+  const openReceipt = async (saleId: string) => {
+    try {
+      const token = getToken();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/sales/${saleId}/receipt`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch receipt");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      // Check if it's a mobile device
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // For mobile: Create a download link
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `receipt-${saleId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(
+          "success",
+          "Receipt downloaded! Check your downloads folder.",
+        );
+      } else {
+        // For desktop: Open in new tab
+        window.open(url, "_blank");
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+    } catch (err) {
+      showToast("error", "Failed to load receipt. Please try again.");
+    }
+  };
+
   const handleCharge = async () => {
     if (isChargeDisabled) return;
     setLoading(true);
@@ -147,29 +187,23 @@ export default function POSPage() {
       clearCart();
       setShowReceipt(saleId);
       setCartOpen(false);
-      showToast("success", "Sale completed!");
-      setTimeout(() => setShowReceipt(null), 8000);
+      showToast("success", "Sale completed! Receipt is ready.");
+
+      // Clear previous timeout if exists
+      if (receiptTimeout) {
+        clearTimeout(receiptTimeout);
+      }
+
+      // Hide receipt button after 10 seconds
+      const timeout = setTimeout(() => {
+        setShowReceipt(null);
+      }, 10000);
+
+      setReceiptTimeout(timeout);
     } catch (err: any) {
       showToast("error", err.message || "Failed to process sale");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const openReceipt = async (saleId: string) => {
-    try {
-      const token = getToken();
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/sales/${saleId}/receipt`,
-        { headers: { Authorization: `Bearer ${token}` } },
-      );
-      if (!response.ok) throw new Error("Failed");
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      URL.revokeObjectURL(url);
-    } catch {
-      showToast("error", "Failed to load receipt");
     }
   };
 
@@ -205,7 +239,6 @@ export default function POSPage() {
       )}
 
       {/* Header */}
-      {/* Header */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex items-center gap-3">
           <Link href="/dashboard">
@@ -234,19 +267,6 @@ export default function POSPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Receipt banner */}
-          {showReceipt && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => openReceipt(showReceipt)}
-              className="h-8 gap-1.5 border-emerald-300 text-emerald-700 text-xs hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400"
-            >
-              <Receipt className="h-3.5 w-3.5" />
-              Print Receipt
-            </Button>
-          )}
-
           {me && (
             <span className="hidden text-xs text-zinc-500 dark:text-zinc-400 sm:block">
               {me.name} · {me.role}
@@ -332,6 +352,8 @@ export default function POSPage() {
             handleCharge={handleCharge}
             isChargeDisabled={isChargeDisabled}
             loading={loading}
+            showReceipt={showReceipt}
+            onPrintReceipt={openReceipt}
           />
         </div>
       </div>
@@ -369,6 +391,8 @@ export default function POSPage() {
                 handleCharge={handleCharge}
                 isChargeDisabled={isChargeDisabled}
                 loading={loading}
+                showReceipt={showReceipt}
+                onPrintReceipt={openReceipt}
               />
             </div>
           </div>
@@ -395,6 +419,8 @@ interface CartPanelProps {
   handleCharge: () => void;
   isChargeDisabled: boolean;
   loading: boolean;
+  showReceipt: string | null;
+  onPrintReceipt: (saleId: string) => void;
 }
 
 function CartPanel({
@@ -412,6 +438,8 @@ function CartPanel({
   handleCharge,
   isChargeDisabled,
   loading,
+  showReceipt,
+  onPrintReceipt,
 }: CartPanelProps) {
   return (
     <div className="flex h-full flex-col">
@@ -573,7 +601,7 @@ function CartPanel({
             </div>
           )}
 
-          {/* Charge */}
+          {/* Charge button */}
           <button
             onClick={handleCharge}
             disabled={isChargeDisabled || loading}
@@ -588,6 +616,17 @@ function CartPanel({
               <>Charge · GHS {total.toFixed(2)}</>
             )}
           </button>
+
+          {/* Receipt button - shown after successful charge */}
+          {showReceipt && (
+            <button
+              onClick={() => onPrintReceipt(showReceipt)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-white py-3 text-sm font-semibold text-emerald-600 transition-all hover:bg-emerald-50 dark:border-emerald-600 dark:bg-transparent dark:text-emerald-400 dark:hover:bg-emerald-950/20"
+            >
+              <Receipt className="h-4 w-4" />
+              Print Receipt
+            </button>
+          )}
         </div>
       </div>
     </div>

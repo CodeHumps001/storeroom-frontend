@@ -41,3 +41,16 @@ export interface Sale {
   createdAt: string;
   items: SaleItem[];
 }
+
+export interface Credit {
+  id: string;
+  customerName: string;
+  customerPhone: string | null;
+  amount: number;
+  amountPaid: number;
+  note: string | null;
+  isPaid: boolean;
+  organizationId: string;
+  createdAt: string;
+  updatedAt: string;
+}

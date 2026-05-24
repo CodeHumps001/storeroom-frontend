@@ -12,6 +12,7 @@ import {
   LogOut,
   LayoutDashboard,
   X,
+  HandCoins,
 } from "lucide-react";
 import { deleteToken } from "@/lib/auth";
 import Image from "next/image";
@@ -29,6 +30,7 @@ const navItems: NavItem[] = [
   { href: "/sales", label: "Sales", icon: ShoppingCart },
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/staff", label: "Staff", icon: Users },
+  { href: "/credits", label: "Credits", icon: HandCoins },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
