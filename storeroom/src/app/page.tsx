@@ -192,7 +192,7 @@ const features = [
 // ── Animation helpers ─────────────────────────────────────────────────────────
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
 };
 
 function FadeIn({
@@ -375,7 +375,7 @@ export default function LandingPage() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
+            <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/30" />
           </motion.div>
         </AnimatePresence>
 
@@ -537,7 +537,7 @@ export default function LandingPage() {
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                   <p className="absolute bottom-2 left-2 right-2 text-center text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
                     {img.label}
                   </p>
@@ -868,7 +868,7 @@ export default function LandingPage() {
                         {faq.q}
                       </span>
                       <span
-                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 transition-all duration-300 group-hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:group-hover:bg-zinc-700 ${isOpen ? "rotate-180 !bg-orange-50 text-orange-600 dark:!bg-orange-500/10 dark:text-orange-400" : ""}`}
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 transition-all duration-300 group-hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:group-hover:bg-zinc-700 ${isOpen ? "rotate-180 bg-orange-50! text-orange-600 dark:bg-orange-500/10! dark:text-orange-400" : ""}`}
                       >
                         <ChevronDown className="h-4 w-4" />
                       </span>
