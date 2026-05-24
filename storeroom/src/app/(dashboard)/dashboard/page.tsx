@@ -18,10 +18,15 @@ import {
   Receipt,
   ArrowRight,
   BarChart3,
+  Crown,
+  Zap,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import apiRequest from "@/lib/api";
 import Link from "next/link";
+import PlanBadge from "@/components/shared/PlanBadge";
+import { usePayment } from "@/hooks/usePayment";
 
 interface Sale {
   id: string;
@@ -53,9 +58,18 @@ interface DashboardData {
   topProducts: TopProductItem[];
 }
 
+interface UserData {
+  organization: {
+    plan: string;
+    subscriptionStatus: string;
+    subscriptionExpiry: string | null;
+  };
+}
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [data, setData] = useState<DashboardData>({
     recentSales: [],
     totalRevenue: 0,
@@ -70,14 +84,16 @@ export default function DashboardPage() {
       setLoading(true);
       setError(null);
 
-      const [salesRes, productsRes, lowStockRes, topProductsRes] =
+      const [userRes, salesRes, productsRes, lowStockRes, topProductsRes] =
         await Promise.all([
+          apiRequest("/auth/me"),
           apiRequest("/sales"),
           apiRequest("/products"),
           apiRequest("/reports/low-stock"),
           apiRequest("/reports/top-products"),
         ]);
 
+      const userData = userRes.data;
       const sales: Sale[] = salesRes.data || [];
       const products = productsRes.data || [];
       const lowStockItems: LowStockItem[] = lowStockRes.data || [];
@@ -86,6 +102,7 @@ export default function DashboardPage() {
       const totalRevenue = sales.reduce((sum, s) => sum + s.totalAmount, 0);
       const recentSales = [...sales].reverse().slice(0, 5);
 
+      setUser(userData);
       setData({
         recentSales,
         totalRevenue,
@@ -119,6 +136,8 @@ export default function DashboardPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+  const { initializePayment, loading: paymentLoading } = usePayment();
 
   if (loading) {
     return (
@@ -157,6 +176,7 @@ export default function DashboardPage() {
   }
 
   const lowStockCount = data.lowStockItems.length;
+  const isFreePlan = user?.organization?.plan === "FREE";
 
   return (
     <div className="space-y-6 pb-10">
@@ -167,6 +187,56 @@ export default function DashboardPage() {
           Here's what's happening with your business.
         </p>
       </div>
+
+      {/* Plan Banner */}
+      {user && (
+        <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-white dark:border-orange-800 dark:from-orange-950/20 dark:to-zinc-950">
+          <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+            <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+              <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-900/30">
+                {isFreePlan ? (
+                  <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                ) : (
+                  <Crown className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                )}
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                    Current Plan:
+                  </h3>
+                  <PlanBadge
+                    plan={user.organization.plan}
+                    subscriptionStatus={user.organization.subscriptionStatus}
+                    subscriptionExpiry={user.organization.subscriptionExpiry}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                  {isFreePlan
+                    ? "Upgrade to PRO to unlock advanced features like detailed analytics, priority support, and more."
+                    : "You're on the PRO plan. Enjoy all the premium features!"}
+                </p>
+              </div>
+            </div>
+            {isFreePlan && (
+              <Button
+                onClick={initializePayment}
+                disabled={paymentLoading}
+                className="bg-orange-500 text-white hover:bg-orange-600"
+              >
+                {paymentLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Upgrade to PRO"
+                )}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

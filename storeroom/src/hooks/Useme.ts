@@ -11,6 +11,9 @@ interface Me {
     organizationType: string;
     location: string;
     contact: string;
+    plan: string;
+    subscriptionStatus: string;
+    subscriptionExpiry: string | null;
   };
 }
 
@@ -19,22 +22,23 @@ const useMe = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchMe = async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest("/auth/me");
+      setMe(response.data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchMe = async () => {
-      try {
-        setLoading(true);
-        const response = await apiRequest("/auth/me");
-        setMe(response.data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchMe();
   }, []);
 
-  return { me, loading, error };
+  return { me, loading, error, refetch: fetchMe };
 };
 
 export { useMe };
