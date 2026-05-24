@@ -1,7 +1,7 @@
 import { useState } from "react";
 import apiRequest from "@/lib/api";
 
-const MONTHLY_PRICE_GHS = 50; // set your price here
+const MONTHLY_PRICE_GHS = 100; // set your price here
 
 const usePayment = () => {
   const [loading, setLoading] = useState(false);
