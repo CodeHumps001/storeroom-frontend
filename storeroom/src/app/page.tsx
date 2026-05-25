@@ -255,7 +255,7 @@ export default function LandingPage() {
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-8 w-8 overflow-hidden rounded-lg">
               <Image
-                src="/logo.png"
+                src="/logo.jpeg"
                 alt="Storeroom"
                 fill
                 className="object-cover"
@@ -1029,7 +1029,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2">
                 <div className="relative h-8 w-8 overflow-hidden rounded-lg">
                   <Image
-                    src="/logo.png"
+                    src="/logo.jpeg"
                     alt="Storeroom"
                     fill
                     className="object-cover"
