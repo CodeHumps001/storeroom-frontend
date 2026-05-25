@@ -76,7 +76,7 @@ export const metadata: Metadata = {
       "Manage products, inventory, barcode scanning, sales, receipts, staff, and analytics with Storeroom business software.",
     images: [
       {
-        url: "/logo.png",
+        url: "../../public/logo.png",
         width: 1200,
         height: 630,
         alt: "Storeroom Inventory Management Platform",
@@ -89,7 +89,7 @@ export const metadata: Metadata = {
     title: "Storeroom — Smart Inventory & POS System",
     description:
       "Modern inventory and POS software for managing products, stock, barcode scanning, receipts, and business analytics.",
-    images: ["/logo.png"],
+    images: ["../../public/logo.png"],
     creator: "@YawFosu869776",
   },
 
@@ -106,9 +106,9 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "../../public/logo.png",
+    shortcut: "../../public/logo.png",
+    apple: "../../public/logo.png",
   },
 
   verification: {
@@ -127,6 +127,17 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        <link
+          rel="icon"
+          href="../../public/logo.png"
+          type="image/png"
+          sizes="any"
+        />
+        <link rel="icon" href="../../public/logo.png" type="image/png" />
+        <link rel="apple-touch-icon" href="../../public/logo.png" />
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className="min-h-screen bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-50">
         <Providers>{children}</Providers>
       </body>
