@@ -169,7 +169,7 @@ export default function RegisterPage() {
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 overflow-hidden rounded-2xl">
                 <Image
-                  src="/logo.png"
+                  src="/logo.jpeg"
                   alt="Storeroom Logo"
                   fill
                   className="object-cover"
@@ -215,7 +215,7 @@ export default function RegisterPage() {
             <div className="mb-6 flex items-center justify-start gap-3 lg:hidden">
               <div className="relative h-10 w-10 overflow-hidden rounded-xl">
                 <Image
-                  src="/logo.png"
+                  src="/logo.jpeg"
                   alt="Storeroom Logo"
                   fill
                   className="object-cover"

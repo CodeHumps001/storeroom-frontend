@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
             <div className="flex items-center gap-3">
               <div className="relative h-12 w-12 overflow-hidden rounded-2xl">
                 <Image
-                  src="/logo.png"
+                  src="/logo.jpeg"
                   alt="Storeroom Logo"
                   fill
                   className="object-cover"
@@ -195,7 +195,7 @@ export default function ForgotPasswordPage() {
             <div className="mb-10 flex items-center justify-center gap-3 lg:hidden">
               <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
                 <Image
-                  src="/logo.png"
+                  src="/logo.jpeg"
                   alt="Storeroom Logo"
                   fill
                   className="object-cover"

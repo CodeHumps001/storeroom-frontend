@@ -250,7 +250,7 @@ export default function POSPage() {
           <div className="flex items-center gap-2">
             <div className="relative h-7 w-7 overflow-hidden rounded-md">
               <Image
-                src="/logo.png"
+                src="/logo.jpeg"
                 alt="Storeroom Logo"
                 fill
                 className="object-cover"

@@ -54,7 +54,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
         <div className="flex items-center justify-start ">
           <div className="relative h-10 w-10 overflow-hidden rounded-lg">
             <Image
-              src="/logo.png"
+              src="/logo.jpeg"
               alt="Storeroom Logo"
               fill
               className="object-cover"
