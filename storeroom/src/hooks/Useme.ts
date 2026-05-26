@@ -15,6 +15,11 @@ interface Me {
     subscriptionStatus: string;
     subscriptionExpiry: string | null;
   };
+  trial?: {
+    isActive: boolean;
+    daysLeft: number;
+    endsAt: string | null;
+  };
 }
 
 const useMe = () => {

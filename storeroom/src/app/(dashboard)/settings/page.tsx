@@ -173,75 +173,99 @@ function SettingsPageContent() {
       </div>
 
       {/* Subscription Section */}
-      {me && (
-        <Card className="border-orange-200 dark:border-orange-800">
-          <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-orange-50 p-2 dark:bg-orange-950/20">
-                {isFreePlan ? (
-                  <Zap className="h-5 w-5 text-orange-500" />
-                ) : (
-                  <Crown className="h-5 w-5 text-emerald-500" />
-                )}
-              </div>
-              <div>
-                <CardTitle className="text-base font-semibold">
-                  Subscription
-                </CardTitle>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  Your current plan and billing details
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col items-start justify-between gap-4 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900 sm:flex-row sm:items-center">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                    Current Plan:
-                  </span>
-                  <PlanBadge
-                    plan={me.organization.plan}
-                    subscriptionStatus={me.organization.subscriptionStatus}
-                    subscriptionExpiry={me.organization.subscriptionExpiry}
-                  />
-                </div>
-                {me.organization.subscriptionExpiry && (
-                  <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>
-                      {isActive ? "Renews on:" : "Expired on:"}{" "}
-                      {formatDate(me.organization.subscriptionExpiry)}
-                    </span>
+      {/* Subscription Section */}
+      {me &&
+        (() => {
+          const trial = me.trial;
+          const isOnTrial = trial?.isActive === true;
+          const trialDaysLeft = trial?.daysLeft || 0;
+          const isFreePlan = me.organization?.plan === "FREE";
+          const isActive = me.organization?.subscriptionStatus === "ACTIVE";
+
+          return (
+            <Card className="border-orange-200 dark:border-orange-800">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-orange-50 p-2 dark:bg-orange-950/20">
+                    {isOnTrial ? (
+                      <Zap className="h-5 w-5 text-orange-500" />
+                    ) : isFreePlan ? (
+                      <Zap className="h-5 w-5 text-orange-500" />
+                    ) : (
+                      <Crown className="h-5 w-5 text-emerald-500" />
+                    )}
                   </div>
-                )}
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {isFreePlan
-                    ? "Upgrade to PRO to unlock unlimited products, advanced analytics, priority support, and more."
-                    : "You're on the PRO plan. Enjoy all premium features!"}
-                </p>
-              </div>
-              {isFreePlan && (
-                <Button
-                  onClick={initializePayment}
-                  disabled={paymentLoading}
-                  className="bg-orange-500 text-white hover:bg-orange-600"
-                >
-                  {paymentLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    "Upgrade to PRO"
+                  <div>
+                    <CardTitle className="text-base font-semibold">
+                      Subscription
+                    </CardTitle>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Your current plan and billing details
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col items-start justify-between gap-4 rounded-lg bg-zinc-50 p-4 dark:bg-zinc-900 sm:flex-row sm:items-center">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                        Current Plan:
+                      </span>
+                      {isOnTrial ? (
+                        <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
+                          TRIAL · {trialDaysLeft} days left
+                        </span>
+                      ) : (
+                        <PlanBadge
+                          plan={me.organization.plan}
+                          subscriptionStatus={
+                            me.organization.subscriptionStatus
+                          }
+                          subscriptionExpiry={
+                            me.organization.subscriptionExpiry
+                          }
+                        />
+                      )}
+                    </div>
+                    {!isOnTrial && me.organization.subscriptionExpiry && (
+                      <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span>
+                          {isActive ? "Renews on:" : "Expired on:"}{" "}
+                          {formatDate(me.organization.subscriptionExpiry)}
+                        </span>
+                      </div>
+                    )}
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {isOnTrial
+                        ? `Your free trial ends in ${trialDaysLeft} days. Upgrade to PRO to keep using all features.`
+                        : isFreePlan
+                          ? "Upgrade to PRO to unlock unlimited products, advanced analytics, priority support, and more."
+                          : "You're on the PRO plan. Enjoy all premium features!"}
+                    </p>
+                  </div>
+                  {!isOnTrial && isFreePlan && (
+                    <Button
+                      onClick={initializePayment}
+                      disabled={paymentLoading}
+                      className="bg-orange-500 text-white hover:bg-orange-600"
+                    >
+                      {paymentLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Upgrade to PRO"
+                      )}
+                    </Button>
                   )}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
       {/* Organization Profile */}
       <Card className="border-zinc-200 dark:border-zinc-800">

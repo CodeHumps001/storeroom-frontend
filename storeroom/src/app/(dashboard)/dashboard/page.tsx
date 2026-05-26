@@ -64,6 +64,11 @@ interface UserData {
     subscriptionStatus: string;
     subscriptionExpiry: string | null;
   };
+  trial?: {
+    isActive: boolean;
+    daysLeft: number;
+    endsAt: string | null;
+  };
 }
 
 export default function DashboardPage() {
@@ -189,54 +194,77 @@ export default function DashboardPage() {
       </div>
 
       {/* Plan Banner */}
-      {user && (
-        <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-white dark:border-orange-800 dark:from-orange-950/20 dark:to-zinc-950">
-          <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
-            <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-              <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-900/30">
-                {isFreePlan ? (
-                  <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                ) : (
-                  <Crown className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                )}
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                    Current Plan:
-                  </h3>
-                  <PlanBadge
-                    plan={user.organization.plan}
-                    subscriptionStatus={user.organization.subscriptionStatus}
-                    subscriptionExpiry={user.organization.subscriptionExpiry}
-                  />
+      {/* Plan Banner */}
+      {user &&
+        (() => {
+          const trial = user.trial;
+          const isOnTrial = trial?.isActive === true;
+          const trialDaysLeft = trial?.daysLeft || 0;
+          const isFreePlan = user.organization?.plan === "FREE";
+
+          return (
+            <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-white dark:border-orange-800 dark:from-orange-950/20 dark:to-zinc-950">
+              <CardContent className="flex flex-col items-center justify-between gap-4 p-4 sm:flex-row">
+                <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+                  <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-900/30">
+                    {isOnTrial ? (
+                      <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    ) : isFreePlan ? (
+                      <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                    ) : (
+                      <Crown className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                        Current Plan:
+                      </h3>
+                      {isOnTrial ? (
+                        <span className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700 dark:bg-orange-900/50 dark:text-orange-300">
+                          TRIAL · {trialDaysLeft} days left
+                        </span>
+                      ) : (
+                        <PlanBadge
+                          plan={user.organization.plan}
+                          subscriptionStatus={
+                            user.organization.subscriptionStatus
+                          }
+                          subscriptionExpiry={
+                            user.organization.subscriptionExpiry
+                          }
+                        />
+                      )}
+                    </div>
+                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      {isOnTrial
+                        ? `Your free trial ends in ${trialDaysLeft} days. Upgrade to PRO to keep using all features.`
+                        : user.organization?.plan === "PRO"
+                          ? "You're on the PRO plan. Enjoy all the premium features!"
+                          : "Upgrade to PRO to unlock advanced features like detailed analytics, priority support, and more."}
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  {isFreePlan
-                    ? "Upgrade to PRO to unlock advanced features like detailed analytics, priority support, and more."
-                    : "You're on the PRO plan. Enjoy all the premium features!"}
-                </p>
-              </div>
-            </div>
-            {isFreePlan && (
-              <Button
-                onClick={initializePayment}
-                disabled={paymentLoading}
-                className="bg-orange-500 text-white hover:bg-orange-600"
-              >
-                {paymentLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  "Upgrade to PRO"
+                {!isOnTrial && isFreePlan && (
+                  <Button
+                    onClick={initializePayment}
+                    disabled={paymentLoading}
+                    className="bg-orange-500 text-white hover:bg-orange-600"
+                  >
+                    {paymentLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      "Upgrade to PRO"
+                    )}
+                  </Button>
                 )}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          );
+        })()}
 
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
