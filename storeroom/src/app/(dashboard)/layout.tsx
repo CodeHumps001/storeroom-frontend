@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 import Sidebar from "@/components/shared/sidebar";
 import { useMe } from "@/hooks/Useme";
+import WhatsAppSupport from "@/components/shared/WhatsAppSupport";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -137,6 +138,9 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
       </div>
+
+      {/* WhatsApp Support Button */}
+      <WhatsAppSupport />
     </div>
   );
 }
