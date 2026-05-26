@@ -96,7 +96,7 @@ const marketImages = [
     label: "Market women, Accra",
   },
   {
-    url: "https://images.unsplash.com/photo-1596473479361-c7c1b91a71bb?q=80&w=800&auto=format&fit=crop",
+    url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=800&auto=format&fit=crop",
     label: "Pharmacy shop, Kumasi",
   },
   {
@@ -248,7 +248,7 @@ export default function LandingPage() {
       {/* ── NAV ─────────────────────────────────────────────────────────────── */}
       <nav
         className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-          scrolled ? "bg-white/95 shadow-sm backdrop-blur-md" : "bg-transparent"
+          scrolled ? "bg-white/5 shadow-sm backdrop-blur-md" : "bg-transparent"
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -465,7 +465,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10"
+                  className="h-12 px-8 text-base font-semibold border-white/30 text-orange-400 hover:bg-white/10"
                 >
                   Sign in to your account
                 </Button>
@@ -923,11 +923,15 @@ export default function LandingPage() {
               </p>
               <div className="mt-8 space-y-4">
                 {[
-                  { icon: Mail, label: "Email", value: "hello@storeroom.app" },
+                  {
+                    icon: Mail,
+                    label: "Email",
+                    value: "storeroompos@gmail.com",
+                  },
                   {
                     icon: Phone,
                     label: "Phone / WhatsApp",
-                    value: "+233 24 412 3456",
+                    value: "+233 257031581 / 0591655713",
                   },
                   {
                     icon: MapPin,
@@ -1007,7 +1011,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/40 text-white hover:bg-white/10"
+                  className="h-12 px-8 text-base font-semibold border-white/40 text-orange-400 hover:bg-white/10"
                 >
                   Sign in
                 </Button>
