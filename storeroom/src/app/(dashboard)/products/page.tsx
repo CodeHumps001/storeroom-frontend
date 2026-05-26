@@ -20,22 +20,28 @@ import {
   TrendingUp,
   CheckCircle2,
   XCircle,
+  Search,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import AddProductForm from "@/components/forms/AddProductForm";
 import { useState } from "react";
 import { Product } from "@/types";
 import apiRequest from "@/lib/api";
+import { useMe } from "@/hooks/Useme";
 
 type Toast = { type: "success" | "error"; message: string } | null;
 
 export default function ProductsPage() {
   const { products, loading, error, fetchProducts } = useProducts();
+  const { me } = useMe();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
   const [toast, setToast] = useState<Toast>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -63,6 +69,20 @@ export default function ProductsPage() {
       setDeletingId(null);
     }
   };
+
+  // Check if user is on FREE plan with expired trial
+  const isFreeRestricted =
+    me?.organization?.plan === "FREE" && !me?.trial?.isActive;
+  const currentProductCount = products.length;
+  const productLimit = 50;
+  const remainingProducts = productLimit - currentProductCount;
+  const isLimitReached =
+    isFreeRestricted && currentProductCount >= productLimit;
+
+  // Filter products based on search
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const totalValue = products.reduce(
     (sum, p) => sum + p.costPrice * p.quantity,
@@ -175,11 +195,56 @@ export default function ProductsPage() {
         <Button
           className="shrink-0 bg-black text-white hover:bg-orange-500 dark:bg-white dark:text-black dark:hover:bg-orange-500"
           onClick={() => setIsOpen(true)}
+          disabled={isLimitReached}
         >
           <Package className="mr-2 h-4 w-4" />
           Add product
         </Button>
       </div>
+
+      {/* Product Limit Warning for FREE users */}
+      {isFreeRestricted && (
+        <Card
+          className={
+            remainingProducts <= 10
+              ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20"
+              : "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20"
+          }
+        >
+          <CardContent className="p-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium">
+                  {remainingProducts > 0 ? (
+                    <>
+                      Free plan: {remainingProducts} of {productLimit} products
+                      remaining
+                    </>
+                  ) : (
+                    <>
+                      Free plan limit reached ({productLimit}/{productLimit}{" "}
+                      products)
+                    </>
+                  )}
+                </p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                  {remainingProducts > 0
+                    ? `Upgrade to PRO to add unlimited products`
+                    : `You've reached the limit. Upgrade to PRO to add more products.`}
+                </p>
+              </div>
+              {remainingProducts <= 10 && (
+                <Button
+                  size="sm"
+                  className="bg-orange-500 text-white hover:bg-orange-600"
+                >
+                  Upgrade to PRO
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats */}
       {products.length > 0 && (
@@ -240,28 +305,57 @@ export default function ProductsPage() {
       {/* Table */}
       <Card className="border-zinc-200 dark:border-zinc-800">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">
-            All products
-          </CardTitle>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="text-base font-semibold">
+              All products
+            </CardTitle>
+            {/* Search Input */}
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+              <Input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9 pr-8"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
+          <p className="text-sm text-zinc-500 mt-2">
+            {filteredProducts.length} of {products.length} products shown
+          </p>
         </CardHeader>
         <CardContent className="p-0">
-          {products.length === 0 ? (
+          {filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
                 <Package className="h-8 w-8 text-zinc-400" />
               </div>
               <h3 className="text-base font-semibold text-zinc-800 dark:text-zinc-200">
-                No products yet
+                No products found
               </h3>
               <p className="mt-1 text-sm text-zinc-500">
-                Get started by adding your first product.
+                {searchTerm
+                  ? `No products matching "${searchTerm}"`
+                  : "Get started by adding your first product."}
               </p>
-              <Button
-                className="mt-5 bg-black text-white hover:bg-orange-500 dark:bg-white dark:text-black dark:hover:bg-orange-500"
-                onClick={() => setIsOpen(true)}
-              >
-                Add product
-              </Button>
+              {!searchTerm && (
+                <Button
+                  className="mt-5 bg-black text-white hover:bg-orange-500 dark:bg-white dark:text-black dark:hover:bg-orange-500"
+                  onClick={() => setIsOpen(true)}
+                  disabled={isLimitReached}
+                >
+                  Add product
+                </Button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -289,7 +383,7 @@ export default function ProductsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => {
+                  {filteredProducts.map((product) => {
                     const stockColor =
                       product.quantity === 0
                         ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400"
