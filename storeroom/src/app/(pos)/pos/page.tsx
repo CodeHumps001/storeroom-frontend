@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,10 @@ import {
   CheckCircle2,
   XCircle,
   X,
+  LayoutGrid,
+  List,
+  Phone,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import apiRequest from "@/lib/api";
@@ -37,16 +41,7 @@ interface CartItem {
 
 type PaymentMethod = "CASH" | "CARD" | "MOBILE_MONEY";
 type Toast = { type: "success" | "error"; message: string } | null;
-
-const IMAGE_BASED_TYPES = [
-  "RESTAURANT",
-  "CAFE",
-  "BAKERY",
-  "FASHION",
-  "BEAUTY",
-  "FURNITURE",
-  "ECOMMERCE",
-];
+type ViewMode = "grid" | "list";
 
 const PAYMENT_OPTIONS: {
   value: PaymentMethod;
@@ -57,6 +52,12 @@ const PAYMENT_OPTIONS: {
   { value: "CARD", label: "Card", icon: CreditCard },
   { value: "MOBILE_MONEY", label: "MoMo", icon: Smartphone },
 ];
+
+// Get unique categories from products
+const getUniqueCategories = (products: Product[]) => {
+  const categories = new Set(products.map((p) => p.category.name));
+  return ["All", ...Array.from(categories)];
+};
 
 export default function POSPage() {
   const { products, loading: productsLoading } = useProducts();
@@ -73,17 +74,36 @@ export default function POSPage() {
   const [receiptTimeout, setReceiptTimeout] = useState<NodeJS.Timeout | null>(
     null,
   );
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [customerPhone, setCustomerPhone] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string>("");
 
-  const isImageMode = me?.organization?.organizationType
-    ? IMAGE_BASED_TYPES.includes(me.organization.organizationType)
-    : false;
+  // Load saved view preference from localStorage
+  useEffect(() => {
+    const savedView = localStorage.getItem("posViewMode") as ViewMode;
+    if (savedView && (savedView === "grid" || savedView === "list")) {
+      setViewMode(savedView);
+    }
+  }, []);
 
-  const filteredProducts = products.filter(
-    (p) =>
+  // Save view preference to localStorage
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem("posViewMode", mode);
+  };
+
+  // Filter products by search term and category
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      p.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "All" || p.category.name === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
+  const categories = getUniqueCategories(products);
   const total = cart.reduce(
     (sum, item) => sum + item.product.sellingPrice * item.quantity,
     0,
@@ -127,6 +147,8 @@ export default function POSPage() {
   const clearCart = () => {
     setCart([]);
     setAmountPaid("");
+    setCustomerPhone("");
+    setCustomerName("");
   };
 
   const openReceipt = async (saleId: string) => {
@@ -142,11 +164,9 @@ export default function POSPage() {
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
 
-      // Check if it's a mobile device
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
-        // For mobile: Create a download link
         const link = document.createElement("a");
         link.href = url;
         link.download = `receipt-${saleId}.pdf`;
@@ -159,7 +179,6 @@ export default function POSPage() {
           "Receipt downloaded! Check your downloads folder.",
         );
       } else {
-        // For desktop: Open in new tab
         window.open(url, "_blank");
         setTimeout(() => URL.revokeObjectURL(url), 1000);
       }
@@ -181,6 +200,8 @@ export default function POSPage() {
           })),
           paymentMethod,
           amountPaid: paid,
+          customerPhone: customerPhone || undefined,
+          customerName: customerName || undefined,
         }),
       });
       const saleId = response.data.id;
@@ -189,12 +210,10 @@ export default function POSPage() {
       setCartOpen(false);
       showToast("success", "Sale completed! Receipt is ready.");
 
-      // Clear previous timeout if exists
       if (receiptTimeout) {
         clearTimeout(receiptTimeout);
       }
 
-      // Hide receipt button after 10 seconds
       const timeout = setTimeout(() => {
         setShowReceipt(null);
       }, 10000);
@@ -273,7 +292,6 @@ export default function POSPage() {
             </span>
           )}
 
-          {/* Mobile cart toggle */}
           <button
             onClick={() => setCartOpen(true)}
             className="relative flex items-center gap-1.5 rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white lg:hidden"
@@ -293,8 +311,9 @@ export default function POSPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left — Products */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Search */}
+          {/* Search + Category Tabs + View Toggle */}
           <div className="shrink-0 border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
+            {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
               <Input
@@ -313,15 +332,57 @@ export default function POSPage() {
                 </button>
               )}
             </div>
-            <p className="mt-1.5 text-xs text-zinc-400">
-              {filteredProducts.length} of {products.length} products
-              {isImageMode ? " · Image view" : " · List view"}
-            </p>
+
+            {/* Category Tabs */}
+            <div className="mt-3 flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium transition-all ${
+                    selectedCategory === category
+                      ? "bg-orange-500 text-white"
+                      : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            {/* View Toggle + Results Count */}
+            <div className="mt-3 flex items-center justify-between">
+              <p className="text-xs text-zinc-400">
+                {filteredProducts.length} of {products.length} products
+              </p>
+              <div className="flex gap-1 rounded-lg border border-zinc-200 p-0.5 dark:border-zinc-700">
+                <button
+                  onClick={() => handleViewModeChange("grid")}
+                  className={`rounded-md p-1.5 transition-all ${
+                    viewMode === "grid"
+                      ? "bg-orange-500 text-white"
+                      : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => handleViewModeChange("list")}
+                  className={`rounded-md p-1.5 transition-all ${
+                    viewMode === "list"
+                      ? "bg-orange-500 text-white"
+                      : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  }`}
+                >
+                  <List className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Product area */}
           <div className="flex-1 overflow-y-auto p-4">
-            {isImageMode ? (
+            {viewMode === "grid" ? (
               <ProductGrid
                 products={filteredProducts}
                 onAddToCart={addToCart}
@@ -354,6 +415,10 @@ export default function POSPage() {
             loading={loading}
             showReceipt={showReceipt}
             onPrintReceipt={openReceipt}
+            customerPhone={customerPhone}
+            setCustomerPhone={setCustomerPhone}
+            customerName={customerName}
+            setCustomerName={setCustomerName}
           />
         </div>
       </div>
@@ -393,6 +458,10 @@ export default function POSPage() {
                 loading={loading}
                 showReceipt={showReceipt}
                 onPrintReceipt={openReceipt}
+                customerPhone={customerPhone}
+                setCustomerPhone={setCustomerPhone}
+                customerName={customerName}
+                setCustomerName={setCustomerName}
               />
             </div>
           </div>
@@ -421,6 +490,10 @@ interface CartPanelProps {
   loading: boolean;
   showReceipt: string | null;
   onPrintReceipt: (saleId: string) => void;
+  customerPhone: string;
+  setCustomerPhone: (v: string) => void;
+  customerName: string;
+  setCustomerName: (v: string) => void;
 }
 
 function CartPanel({
@@ -440,6 +513,10 @@ function CartPanel({
   loading,
   showReceipt,
   onPrintReceipt,
+  customerPhone,
+  setCustomerPhone,
+  customerName,
+  setCustomerName,
 }: CartPanelProps) {
   return (
     <div className="flex h-full flex-col">
@@ -533,6 +610,28 @@ function CartPanel({
 
       {/* Summary + Payment */}
       <div className="shrink-0 border-t border-zinc-100 dark:border-zinc-800">
+        {/* Customer Info Section */}
+        <div className="space-y-2 border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+          <Label className="text-xs font-medium text-zinc-500 flex items-center gap-1">
+            <Phone className="h-3 w-3" />
+            Customer Phone (for SMS receipt)
+          </Label>
+          <Input
+            type="tel"
+            placeholder="e.g., 024XXXXXXX"
+            value={customerPhone}
+            onChange={(e) => setCustomerPhone(e.target.value)}
+            className="h-8 text-sm"
+          />
+          <Input
+            type="text"
+            placeholder="Customer name (optional)"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="h-8 text-sm"
+          />
+        </div>
+
         {/* Total */}
         <div className="flex items-center justify-between px-4 py-3">
           <span className="text-sm font-medium text-zinc-500">Total</span>

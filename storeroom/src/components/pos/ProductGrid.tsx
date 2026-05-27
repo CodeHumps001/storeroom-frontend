@@ -23,7 +23,7 @@ export default function ProductGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8">
       {products.map((product) => (
         <div
           key={product.id}
@@ -40,7 +40,7 @@ export default function ProductGrid({
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
-                <span className="text-4xl font-bold text-zinc-300 dark:text-zinc-600">
+                <span className="text-3xl font-bold text-zinc-300 dark:text-zinc-600">
                   {product.name.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -48,28 +48,28 @@ export default function ProductGrid({
 
             {/* Quick add overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/20">
-              <div className="flex h-10 w-10 scale-0 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-transform duration-200 group-hover:scale-100">
-                <Plus className="h-5 w-5" />
+              <div className="flex h-8 w-8 scale-0 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg transition-transform duration-200 group-hover:scale-100">
+                <Plus className="h-4 w-4" />
               </div>
             </div>
 
             {/* Stock badge */}
             {product.quantity <= 10 && (
-              <div className="absolute left-2 top-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                {product.quantity === 0 ? "Out" : `${product.quantity} left`}
+              <div className="absolute left-1.5 top-1.5 rounded-full bg-red-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
+                {product.quantity === 0 ? "Out" : `${product.quantity}`}
               </div>
             )}
           </div>
 
           {/* Info */}
-          <div className="p-3">
-            <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <div className="p-2">
+            <p className="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-100">
               {product.name}
             </p>
-            <p className="mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500">
+            <p className="mt-0.5 truncate text-[10px] text-zinc-400 dark:text-zinc-500">
               {product.category.name}
             </p>
-            <p className="mt-2 text-base font-bold text-emerald-600 dark:text-emerald-400">
+            <p className="mt-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
               GHS {product.sellingPrice.toFixed(2)}
             </p>
           </div>

@@ -6,11 +6,12 @@ import { useMe } from "@/hooks/Useme";
 export default function WhatsAppSupport() {
   const { me } = useMe();
 
-  // Only show for PRO users (not during trial)
+  // Show for PRO users OR users on active trial
   const isPro = me?.organization?.plan === "PRO";
+  const isOnTrial = me?.trial?.isActive === true;
 
-  // Don't show for FREE or trial users
-  if (!isPro) return null;
+  // Show for PRO users OR trial users
+  if (!isPro && !isOnTrial) return null;
 
   const openWhatsApp = () => {
     // Get user info for dynamic message
@@ -18,6 +19,7 @@ export default function WhatsAppSupport() {
     const userEmail = me?.email || "";
     const organizationName = me?.organization?.organizationName || "";
     const userRole = me?.role || "";
+    const isTrial = me?.trial?.isActive === true;
 
     // Get current page URL
     const currentPage =
@@ -26,7 +28,7 @@ export default function WhatsAppSupport() {
     // Current timestamp
     const timestamp = new Date().toLocaleString();
 
-    // Create dynamic message
+    // Create dynamic message with trial info
     const message = `Hello Storeroom Support! 👋
 
 I need help with the following:
@@ -36,6 +38,7 @@ I need help with the following:
 • Email: ${userEmail}
 • Role: ${userRole}
 • Organization: ${organizationName}
+• Plan: ${isPro ? "PRO" : isTrial ? "TRIAL" : "FREE"}
 
 📍 Page: ${currentPage}
 🕐 Time: ${timestamp}
