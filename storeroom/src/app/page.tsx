@@ -30,6 +30,20 @@ import {
   Clock,
   Smartphone,
   CreditCard,
+  Store,
+  ShoppingBag,
+  Building2,
+  Shirt,
+  Gem,
+  BookOpen,
+  Wrench,
+  Car,
+  Cpu,
+  Sofa,
+  Warehouse,
+  Truck,
+  Globe,
+  MoreHorizontal,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 
@@ -70,50 +84,107 @@ const TiktokIcon = () => (
   </svg>
 );
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Business Types Data ──────────────────────────────────────────────────────
+const businessTypes = [
+  { icon: Store, name: "Retail", color: "bg-emerald-100 text-emerald-700" },
+  { icon: Building2, name: "Wholesale", color: "bg-blue-100 text-blue-700" },
+  { icon: ShoppingBag, name: "Grocery", color: "bg-lime-100 text-lime-700" },
+  { icon: Store, name: "Supermarket", color: "bg-teal-100 text-teal-700" },
+  { icon: Pill, name: "Pharmacy", color: "bg-green-100 text-green-700" },
+  { icon: Cpu, name: "Electronics", color: "bg-cyan-100 text-cyan-700" },
+  { icon: Shirt, name: "Fashion", color: "bg-pink-100 text-pink-700" },
+  { icon: Wrench, name: "Hardware", color: "bg-amber-100 text-amber-700" },
+  { icon: Gem, name: "Beauty", color: "bg-rose-100 text-rose-700" },
+  { icon: BookOpen, name: "Bookstore", color: "bg-indigo-100 text-indigo-700" },
+  { icon: BookOpen, name: "Stationery", color: "bg-sky-100 text-sky-700" },
+  { icon: Car, name: "Auto Parts", color: "bg-orange-100 text-orange-700" },
+  {
+    icon: Smartphone,
+    name: "Mobile Shop",
+    color: "bg-purple-100 text-purple-700",
+  },
+  { icon: Sofa, name: "Furniture", color: "bg-stone-100 text-stone-700" },
+  { icon: Warehouse, name: "Warehouse", color: "bg-slate-100 text-slate-700" },
+  {
+    icon: Truck,
+    name: "Distribution",
+    color: "bg-neutral-100 text-neutral-700",
+  },
+  { icon: Globe, name: "Ecommerce", color: "bg-violet-100 text-violet-700" },
+  { icon: MoreHorizontal, name: "Other", color: "bg-gray-100 text-gray-700" },
+];
+
+// Pill component for missing Lucide icon
+function Pill(props: any) {
+  return (
+    <svg
+      {...props}
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+// ── Hero Images (updated to match business types) ────────────────────────────
 const heroImages = [
   {
     url: "https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1400&auto=format&fit=crop",
-    caption: "Fast checkout with our POS system",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=1400&auto=format&fit=crop",
-    caption: "African market women managing their goods",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=1400&auto=format&fit=crop",
-    caption: "Real-time stock management for your store",
+    caption: "Fast checkout for retail and supermarket businesses",
   },
   {
     url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1400&auto=format&fit=crop",
-    caption: "Empowering shop owners with smart tools",
+    caption: "Manage inventory and sales from one dashboard",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?q=80&w=1400&auto=format&fit=crop",
+    caption: "Electronics and mobile shops using Storeroom",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?q=80&w=1400&auto=format&fit=crop",
+    caption: "Pharmacy stock and product management made simple",
   },
 ];
 
+// ── Market Images (updated to match business types) ──────────────────────────
 const marketImages = [
   {
     url: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?q=80&w=800&auto=format&fit=crop",
-    label: "Market women, Accra",
+    label: "Retail store, Accra",
+    type: "RETAIL",
   },
   {
     url: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=800&auto=format&fit=crop",
-    label: "Pharmacy shop, Kumasi",
+    label: "Pharmacy, Kumasi",
+    type: "PHARMACY",
   },
   {
     url: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?q=80&w=800&auto=format&fit=crop",
-    label: "Electronics retailer",
+    label: "Electronics shop",
+    type: "ELECTRONICS",
   },
   {
     url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=800&auto=format&fit=crop",
-    label: "Grocery store owner",
+    label: "Grocery store",
+    type: "GROCERY",
   },
   {
-    url: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?q=80&w=800&auto=format&fit=crop",
-    label: "Small business, Takoradi",
+    url: "https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?q=80&w=800&auto=format&fit=crop",
+    label: "Fashion boutique",
+    type: "FASHION",
   },
   {
-    url: "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=800&auto=format&fit=crop",
-    label: "Supermarket aisle",
+    url: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop",
+    label: "Supermarket",
+    type: "SUPERMARKET",
   },
 ];
 
@@ -153,25 +224,25 @@ const testimonials = [
 const features = [
   {
     icon: Package,
-    title: "Inventory Tracking",
+    title: "Real-time Inventory",
     description:
-      "Know exactly what's in stock, what's selling fast, and what needs reordering — in real time.",
+      "Track stock levels as they change. Know what's selling fast and what needs reordering.",
   },
   {
     icon: Receipt,
-    title: "POS & Receipts",
+    title: "POS & Digital Receipts",
     description:
-      "Process sales fast with our POS. Generate PDF receipts instantly. Works on any device.",
+      "Process sales in seconds. Email or print receipts. Works on any device.",
   },
   {
     icon: BarChart3,
     title: "Sales Analytics",
     description:
-      "See your top products, daily revenue, and profit margins. Make decisions backed by data.",
+      "See your top products, daily revenue, and profit margins. Make data-driven decisions.",
   },
   {
     icon: HandCoins,
-    title: "Credit Tracking",
+    title: "Credit Sales Tracking",
     description:
       "Track customers who buy on credit. Record payments and never forget who owes you.",
   },
@@ -179,13 +250,13 @@ const features = [
     icon: Users,
     title: "Staff Management",
     description:
-      "Add cashiers and managers with different access levels. Know who did what, when.",
+      "Add cashiers with different access levels. Know who did what, when.",
   },
   {
     icon: Shield,
-    title: "Secure & Reliable",
+    title: "Bank-level Security",
     description:
-      "Bank-level security. Automatic backups. Your data is always safe with us.",
+      "Your data is encrypted and backed up daily. Only you and your team have access.",
   },
 ];
 
@@ -225,8 +296,6 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
-
-  // Put this snippet right into your component tree
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
@@ -248,7 +317,7 @@ export default function LandingPage() {
       {/* ── NAV ─────────────────────────────────────────────────────────────── */}
       <nav
         className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-          scrolled ? "bg-white/5 shadow-sm backdrop-blur-md" : "bg-transparent"
+          scrolled ? "bg-white/95 shadow-sm backdrop-blur-md" : "bg-transparent"
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -270,17 +339,19 @@ export default function LandingPage() {
           </Link>
 
           <div className="hidden items-center gap-8 md:flex">
-            {["Features", "Pricing", "Customers", "FAQ"].map((item) => (
-              <Link
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                  scrolled ? "text-zinc-600" : "text-white/90"
-                }`}
-              >
-                {item}
-              </Link>
-            ))}
+            {["Features", "Businesses", "Pricing", "Customers", "FAQ"].map(
+              (item) => (
+                <Link
+                  key={item}
+                  href={`#${item.toLowerCase()}`}
+                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                    scrolled ? "text-zinc-600" : "text-white/90"
+                  }`}
+                >
+                  {item}
+                </Link>
+              ),
+            )}
           </div>
 
           <div className="hidden items-center gap-3 md:flex">
@@ -302,7 +373,7 @@ export default function LandingPage() {
                 size="sm"
                 className="bg-orange-500 text-white hover:bg-orange-600"
               >
-                Get started free
+                Start free trial
               </Button>
             </Link>
           </div>
@@ -329,16 +400,18 @@ export default function LandingPage() {
               className="absolute left-0 right-0 top-16 border-b bg-white shadow-lg md:hidden"
             >
               <div className="space-y-1 p-4">
-                {["Features", "Pricing", "Customers", "FAQ"].map((item) => (
-                  <Link
-                    key={item}
-                    href={`#${item.toLowerCase()}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block rounded-lg px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50"
-                  >
-                    {item}
-                  </Link>
-                ))}
+                {["Features", "Businesses", "Pricing", "Customers", "FAQ"].map(
+                  (item) => (
+                    <Link
+                      key={item}
+                      href={`#${item.toLowerCase()}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block rounded-lg px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-50"
+                    >
+                      {item}
+                    </Link>
+                  ),
+                )}
                 <div className="flex gap-3 pt-3">
                   <Link href="/login" className="flex-1">
                     <Button variant="outline" className="w-full">
@@ -356,9 +429,9 @@ export default function LandingPage() {
           )}
         </AnimatePresence>
       </nav>
+
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
       <section className="relative flex min-h-screen items-center overflow-hidden">
-        {/* Background slideshow */}
         <AnimatePresence mode="wait">
           <motion.div
             key={heroIndex}
@@ -375,7 +448,7 @@ export default function LandingPage() {
               className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/60 to-black/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
           </motion.div>
         </AnimatePresence>
 
@@ -388,22 +461,25 @@ export default function LandingPage() {
               className={`h-1.5 rounded-full transition-all duration-300 ${
                 i === heroIndex ? "w-8 bg-orange-500" : "w-2 bg-white/50"
               }`}
+              aria-label={`View slide ${i + 1}`}
             />
           ))}
         </div>
 
-        {/* Prev/Next */}
+        {/* Prev/Next buttons */}
         <button
           onClick={() =>
             setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length)
           }
           className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
+          aria-label="Previous slide"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={() => setHeroIndex((i) => (i + 1) % heroImages.length)}
           className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
+          aria-label="Next slide"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -434,9 +510,9 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl"
             >
-              Manage your shop.
+              Smart inventory & POS for
               <br />
-              <span className="text-orange-400">Grow your business.</span>
+              <span className="text-orange-400">African businesses</span>
             </motion.h1>
 
             <motion.p
@@ -445,9 +521,9 @@ export default function LandingPage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-6 text-lg leading-relaxed text-white/80"
             >
-              Storeroom gives Ghanaian SMEs a simple, powerful platform to track
-              inventory, process sales, manage staff, and understand their
-              business — from any device.
+              Track inventory, process sales, manage staff, and understand your
+              business — all from one platform. Used by 3,500+ shops across
+              Ghana.
             </motion.p>
 
             <motion.div
@@ -465,7 +541,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/30 text-orange-400 hover:bg-white/10"
+                  className="h-12 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10"
                 >
                   Sign in to your account
                 </Button>
@@ -494,6 +570,7 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
       {/* ── STATS ────────────────────────────────────────────────────────────── */}
       <section className="border-y border-zinc-100 bg-white py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -501,8 +578,8 @@ export default function LandingPage() {
             {[
               { number: "3,500+", label: "Active businesses" },
               { number: "GHS 50M+", label: "Inventory tracked" },
-              { number: "98%", label: "Satisfaction rate" },
-              { number: "24/7", label: "Customer support" },
+              { number: "98%", label: "Customer satisfaction" },
+              { number: "24/7", label: "Support available" },
             ].map((stat, i) => (
               <FadeIn key={i} delay={i * 0.1}>
                 <p className="text-3xl font-extrabold text-zinc-900">
@@ -514,6 +591,40 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── BUSINESS TYPES SECTION ──────────────────────────────────────────── */}
+      <section id="businesses" className="py-16 md:py-20 bg-zinc-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <FadeIn className="mb-10 text-center">
+            <span className="text-sm font-semibold uppercase tracking-widest text-orange-500">
+              Who we serve
+            </span>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
+              Built for every business
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-zinc-500">
+              From corner shops to supermarkets, wholesalers to pharmacies —
+              Storeroom adapts to your business.
+            </p>
+          </FadeIn>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {businessTypes.map((type, i) => (
+              <FadeIn key={i} delay={i * 0.02}>
+                <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-4 text-center transition-all hover:shadow-md">
+                  <div className={`rounded-full p-3 ${type.color}`}>
+                    <type.icon className="h-5 w-5" />
+                  </div>
+                  <span className="text-xs font-medium text-zinc-700">
+                    {type.name}
+                  </span>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── MARKET IMAGE GRID ─────────────────────────────────────────────────── */}
       <section className="py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -522,31 +633,39 @@ export default function LandingPage() {
               Powering businesses across Ghana
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-zinc-500">
-              From market women in Makola to electronics shops in Kumasi —
-              Storeroom works for you.
+              From market stalls to retail stores, Storeroom works for you.
             </p>
           </FadeIn>
 
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+          {/* Masonry-style grid using columns */}
+          <div className="columns-2 gap-3 space-y-3 md:columns-3 lg:columns-4 xl:columns-6">
             {marketImages.map((img, i) => (
-              <FadeIn key={i} delay={i * 0.07}>
-                <div className="group relative overflow-hidden rounded-2xl aspect-square">
-                  <Image
-                    src={img.url}
-                    alt={img.label}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                  <p className="absolute bottom-2 left-2 right-2 text-center text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
-                    {img.label}
-                  </p>
+              <FadeIn key={i} delay={i * 0.05}>
+                <div className="group relative mb-3 overflow-hidden rounded-2xl break-inside-avoid">
+                  <div className="relative aspect-[3/4] w-full">
+                    <Image
+                      src={img.url}
+                      alt={img.label}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                      <p className="text-sm font-semibold text-white">
+                        {img.label}
+                      </p>
+                      <span className="mt-1 inline-block rounded-full bg-orange-500/80 px-2 py-0.5 text-[10px] font-medium text-white">
+                        {img.type}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </FadeIn>
             ))}
           </div>
         </div>
       </section>
+
       {/* ── FEATURES ─────────────────────────────────────────────────────────── */}
       <section id="features" className="bg-zinc-50 py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -558,8 +677,7 @@ export default function LandingPage() {
               Everything your shop needs
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-zinc-500">
-              No complicated setup. No training required. Just sign up and
-              start.
+              Simple, powerful tools built for African small businesses.
             </p>
           </FadeIn>
 
@@ -580,7 +698,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {/* ── HOW IT WORKS (with background image) ─────────────────────────────── */}
+
+      {/* ── HOW IT WORKS ──────────────────────────────────────────────────────── */}
       <section id="how-it-works" className="relative overflow-hidden py-20">
         <div className="absolute inset-0">
           <Image
@@ -646,18 +765,19 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
       {/* ── TESTIMONIALS ─────────────────────────────────────────────────────── */}
       <section id="customers" className="py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <FadeIn className="mb-12 text-center">
             <span className="text-sm font-semibold uppercase tracking-widest text-orange-500">
-              Customers
+              Testimonials
             </span>
             <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-              Real people. Real results.
+              Loved by business owners
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-zinc-500">
-              Business owners across Ghana trust Storeroom every single day.
+              Join thousands of satisfied shop owners who trust Storeroom.
             </p>
           </FadeIn>
 
@@ -699,6 +819,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
       {/* ── PRICING ──────────────────────────────────────────────────────────── */}
       <section id="pricing" className="bg-zinc-50 py-16 md:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -734,6 +855,8 @@ export default function LandingPage() {
                     "Up to 50 products",
                     "Basic inventory tracking",
                     "1 user account",
+                    "Email support",
+                    "14-day free trial",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 shrink-0 text-emerald-500" />
@@ -764,16 +887,18 @@ export default function LandingPage() {
                   <span className="text-zinc-500">/month</span>
                 </div>
                 <p className="mt-2 text-sm text-zinc-500">
-                  For growing businesses with more volume
+                  For growing businesses with higher volume
                 </p>
                 <ul className="mt-6 space-y-3">
                   {[
                     "Unlimited products",
                     "Advanced reports & analytics",
                     "POS system included",
-                    "Credit tracking",
+                    "Credit sales tracking",
                     "Up to 5 staff accounts",
                     "Priority WhatsApp support",
+                    "SMS sale receipts for customers", // ✅ Added this line
+                    "14-day free trial",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 shrink-0 text-orange-500" />
@@ -783,7 +908,7 @@ export default function LandingPage() {
                 </ul>
                 <Link href="/register" className="mt-8 block">
                   <Button className="w-full bg-orange-500 text-white hover:bg-orange-600">
-                    Start 14-day free trial
+                    Start free trial
                   </Button>
                 </Link>
               </div>
@@ -796,45 +921,47 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+
       {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
       <section
         id="faq"
-        className="relative overflow-hidden bg-zinc-50/50 py-20 md:py-28 dark:bg-zinc-950/20"
+        className="relative overflow-hidden bg-zinc-50/50 py-20 md:py-28"
       >
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          {/* Centered Modern Header */}
           <FadeIn className="mb-16 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold tracking-wider text-orange-600 uppercase dark:bg-orange-500/10 dark:text-orange-400">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold tracking-wider text-orange-600 uppercase">
               <HelpCircle className="h-3.5 w-3.5" />
               FAQ
             </span>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-              Questions & Answers
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl">
+              Frequently asked questions
             </h2>
-            <p className="mt-3 text-base text-zinc-500 dark:text-zinc-400">
-              Everything you need to know about setting up Storeroom for your
-              business.
+            <p className="mt-3 text-base text-zinc-500">
+              Everything you need to know about Storeroom.
             </p>
           </FadeIn>
 
-          {/* Modern Accordion List */}
           <div className="space-y-3.5">
             {[
               {
                 q: "How much does Storeroom cost?",
-                a: "Free plan available for small shops. Pro is GHS 100/month — no setup fees, no contracts.",
+                a: "Free plan available for small shops with up to 50 products. Pro is GHS 100/month — no setup fees, no contracts.",
+              },
+              {
+                q: "How does the free trial work?",
+                a: "You get 14 days of full access to all Pro features. No credit card required. Cancel anytime during the trial.",
               },
               {
                 q: "Do I need internet to use it?",
-                a: "The dashboard needs internet. A mobile offline mode is on our roadmap for later this year.",
+                a: "The dashboard needs internet to sync data. An offline mode for mobile is coming soon.",
               },
               {
                 q: "Can I import my existing products?",
-                a: "Yes. You can add products manually or we'll help you import from Excel.",
+                a: "Yes. You can add products manually or import from Excel/CSV. We'll help you migrate your data.",
               },
               {
                 q: "Is there a long-term contract?",
-                a: "No. Month-to-month. Cancel anytime with no penalties whatsoever.",
+                a: "No. Month-to-month. Cancel anytime with no penalties.",
               },
               {
                 q: "What kind of support do you offer?",
@@ -842,7 +969,7 @@ export default function LandingPage() {
               },
               {
                 q: "Is my data safe?",
-                a: "Yes. We use bank-level encryption and automatic daily backups. Your data is yours.",
+                a: "Yes. We use bank-level encryption and automatic daily backups. Your data belongs to you.",
               },
             ].map((faq, i) => {
               const isOpen = openFaq === i;
@@ -851,8 +978,8 @@ export default function LandingPage() {
                   <div
                     className={`group rounded-2xl border transition-all duration-300 ${
                       isOpen
-                        ? "border-orange-500/20 bg-white shadow-md shadow-orange-500/5 dark:bg-zinc-900"
-                        : "border-zinc-200/80 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-zinc-700"
+                        ? "border-orange-500/20 bg-white shadow-md shadow-orange-500/5"
+                        : "border-zinc-200/80 bg-white hover:border-zinc-300"
                     }`}
                   >
                     <button
@@ -862,18 +989,23 @@ export default function LandingPage() {
                       aria-expanded={isOpen}
                     >
                       <span
-                        className={`font-semibold text-zinc-900 transition-colors dark:text-zinc-100 ${isOpen ? "text-orange-600 dark:text-orange-400" : ""}`}
+                        className={`font-semibold text-zinc-900 transition-colors ${
+                          isOpen ? "text-orange-600" : ""
+                        }`}
                       >
                         {faq.q}
                       </span>
                       <span
-                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 transition-all duration-300 group-hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:group-hover:bg-zinc-700 ${isOpen ? "rotate-180 bg-orange-50! text-orange-600 dark:bg-orange-500/10! dark:text-orange-400" : ""}`}
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-zinc-50 text-zinc-500 transition-all duration-300 group-hover:bg-zinc-100 ${
+                          isOpen
+                            ? "rotate-180 bg-orange-50 text-orange-600"
+                            : ""
+                        }`}
                       >
                         <ChevronDown className="h-4 w-4" />
                       </span>
                     </button>
 
-                    {/* Smooth Animated Height Container */}
                     <div
                       className={`grid transition-all duration-300 ease-in-out ${
                         isOpen
@@ -882,7 +1014,7 @@ export default function LandingPage() {
                       }`}
                     >
                       <div className="overflow-hidden">
-                        <p className="px-6 pb-5 text-[14.5px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+                        <p className="px-6 pb-5 text-[14.5px] leading-relaxed text-zinc-600">
                           {faq.a}
                         </p>
                       </div>
@@ -895,7 +1027,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CONTACT (with background image) ──────────────────────────────────── */}
+      {/* ── CONTACT ──────────────────────────────────────────────────────────── */}
       <section id="contact" className="relative overflow-hidden py-20">
         <div className="absolute inset-0">
           <Image
@@ -989,6 +1121,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
       {/* ── CTA ──────────────────────────────────────────────────────────────── */}
       <section className="bg-orange-500 py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
@@ -997,8 +1130,7 @@ export default function LandingPage() {
               Ready to grow your business?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-orange-100">
-              Join thousands of shop owners across Ghana who use Storeroom every
-              day to manage their business smarter.
+              Join 3,500+ shop owners across Ghana who use Storeroom every day.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/register">
@@ -1010,7 +1142,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/40 text-orange-400 hover:bg-white/10"
+                  className="h-12 px-8 text-base font-semibold border-white/40 text-white hover:bg-white/10"
                 >
                   Sign in
                 </Button>
@@ -1022,9 +1154,9 @@ export default function LandingPage() {
           </FadeIn>
         </div>
       </section>
-      {/* ── FOOTER (Redesigned & Polished) ─────────────────────────────────────*/}
+
+      {/* ── FOOTER ─────────────────────────────────────────────────────────────*/}
       <footer className="bg-white border-t border-zinc-100">
-        {/* Main Footer */}
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
             {/* Brand Column */}
@@ -1078,8 +1210,8 @@ export default function LandingPage() {
                   ["Features", "#features"],
                   ["Pricing", "#pricing"],
                   ["How it works", "#how-it-works"],
+                  ["Business Types", "#businesses"],
                   ["Integrations", "#"],
-                  ["Roadmap", "#"],
                 ].map(([label, href]) => (
                   <li key={label}>
                     <Link
