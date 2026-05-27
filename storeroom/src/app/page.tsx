@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown, HelpCircle, Loader2 } from "lucide-react";
 import {
   Menu,
   X,
@@ -297,6 +297,11 @@ export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [heroIndex, setHeroIndex] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [contactLoading, setContactLoading] = useState(false);
+  const [contactSuccess, setContactSuccess] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -311,6 +316,46 @@ export default function LandingPage() {
     );
     return () => clearInterval(t);
   }, []);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContactLoading(true);
+    setContactSuccess(false);
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/contact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: contactName,
+            email: contactEmail,
+            message: contactMessage,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setContactSuccess(true);
+        setContactName("");
+        setContactEmail("");
+        setContactMessage("");
+        setTimeout(() => setContactSuccess(false), 5000);
+      } else {
+        alert(data.message || "Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      console.error("Contact error:", error);
+      alert("Failed to send message. Please check your connection.");
+    } finally {
+      setContactLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900 antialiased">
@@ -1101,27 +1146,60 @@ export default function LandingPage() {
                 <h3 className="mb-6 text-xl font-bold text-white">
                   Send us a message
                 </h3>
-                <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Your name"
-                    className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500"
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500"
-                  />
-                  <textarea
-                    rows={4}
-                    placeholder="Your message..."
-                    className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500 resize-none"
-                  />
-                  <Button className="w-full bg-orange-500 text-white hover:bg-orange-600">
-                    Send message
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                <form onSubmit={handleContactSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Your name"
+                      value={contactName}
+                      onChange={(e) => setContactName(e.target.value)}
+                      required
+                      className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      type="email"
+                      placeholder="Email address"
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      required
+                      className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <textarea
+                      rows={4}
+                      placeholder="Your message..."
+                      value={contactMessage}
+                      onChange={(e) => setContactMessage(e.target.value)}
+                      required
+                      className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-orange-500 resize-none"
+                    />
+                  </div>
+                  {contactSuccess && (
+                    <div className="rounded-lg bg-emerald-500/20 p-3 text-center text-sm text-emerald-300">
+                      ✓ Message sent successfully! We'll get back to you soon.
+                    </div>
+                  )}
+                  <Button
+                    type="submit"
+                    disabled={contactLoading}
+                    className="w-full bg-orange-500 text-white hover:bg-orange-600"
+                  >
+                    {contactLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send message
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
-                </div>
+                </form>
               </div>
             </FadeIn>
           </div>
