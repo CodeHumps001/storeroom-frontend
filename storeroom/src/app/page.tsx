@@ -431,26 +431,33 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ─────────────────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-screen items-center overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={heroIndex}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
-            className="absolute inset-0"
-          >
-            <Image
-              src={heroImages[heroIndex].url}
-              alt={heroImages[heroIndex].caption}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
-          </motion.div>
-        </AnimatePresence>
+      <section className="relative flex min-h-screen items-center overflow-hidden bg-black">
+        {/* Solid black background that NEVER goes transparent */}
+        <div className="absolute inset-0 bg-black z-0" />
+
+        {/* Background slideshow */}
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={heroIndex}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={heroImages[heroIndex].url}
+                alt={heroImages[heroIndex].caption}
+                fill
+                className="object-cover opacity-80"
+                priority
+              />
+              {/* Dark overlay on the image */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/50" />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
         {/* Slide indicators */}
         <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2">
@@ -471,14 +478,14 @@ export default function LandingPage() {
           onClick={() =>
             setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length)
           }
-          className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
+          className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
           aria-label="Previous slide"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           onClick={() => setHeroIndex((i) => (i + 1) % heroImages.length)}
-          className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
+          className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
           aria-label="Next slide"
         >
           <ChevronRight className="h-5 w-5" />
@@ -522,8 +529,7 @@ export default function LandingPage() {
               className="mt-6 text-lg leading-relaxed text-white/80"
             >
               Track inventory, process sales, manage staff, and understand your
-              business — all from one platform. Used by 3,500+ shops across
-              Ghana.
+              business all from one platform. Used by 500+ shops across Ghana.
             </motion.p>
 
             <motion.div
@@ -576,7 +582,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
             {[
-              { number: "3,500+", label: "Active businesses" },
+              { number: "500+", label: "Active businesses" },
               { number: "GHS 50M+", label: "Inventory tracked" },
               { number: "98%", label: "Customer satisfaction" },
               { number: "24/7", label: "Support available" },
