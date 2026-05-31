@@ -39,7 +39,7 @@ interface CartItem {
   quantity: number;
 }
 
-type PaymentMethod = "CASH" | "CARD" | "MOBILE_MONEY";
+type PaymentMethod = "CASH" | "CARD" | "MOMO";
 type Toast = { type: "success" | "error"; message: string } | null;
 type ViewMode = "grid" | "list";
 
@@ -50,7 +50,7 @@ const PAYMENT_OPTIONS: {
 }[] = [
   { value: "CASH", label: "Cash", icon: Banknote },
   { value: "CARD", label: "Card", icon: CreditCard },
-  { value: "MOBILE_MONEY", label: "MoMo", icon: Smartphone },
+  { value: "MOMO", label: "MoMo", icon: Smartphone },
 ];
 
 // Get unique categories from products
