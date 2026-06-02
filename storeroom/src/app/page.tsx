@@ -584,7 +584,7 @@ export default function LandingPage() {
               className="mt-8 flex flex-col gap-4 sm:flex-row"
             >
               <Link href="/register">
-                <Button className="h-12 gap-2 bg-orange-500 px-8 text-base font-semibold text-white hover:bg-orange-600">
+                <Button className="h-12 gap-2 bg-orange-500 px-8 text-base font-semibold text-white hover:bg-orange-600 cursor-pointer">
                   Start free — no card needed
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -592,7 +592,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/30 text-white hover:bg-white/10"
+                  className="h-12 px-8 bg-white/10  font-semibold border-white/30 text-white hover:bg-white/10 cursor-pointer hover:text-orange-400"
                 >
                   Sign in to your account
                 </Button>
@@ -1218,7 +1218,7 @@ export default function LandingPage() {
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/register">
-                <Button className="h-12 gap-2 bg-white px-8 text-base font-semibold text-orange-500 hover:bg-orange-50">
+                <Button className="h-12 gap-2 bg-white px-8 text-base font-semibold text-orange-500 hover:bg-orange-50 cursor-pointer">
                   Start free trial
                   <ArrowRight className="h-4 w-4" />
                 </Button>
@@ -1226,7 +1226,7 @@ export default function LandingPage() {
               <Link href="/login">
                 <Button
                   variant="outline"
-                  className="h-12 px-8 text-base font-semibold border-white/40 text-white hover:bg-white/10"
+                  className="h-12 px-8 text-base bg-white/5 font-semibold border-white/40 text-white hover:bg-white/10 cursor-pointer"
                 >
                   Sign in
                 </Button>
@@ -1406,8 +1406,7 @@ export default function LandingPage() {
                 </Link>
               </div>
               <p className="text-xs text-zinc-400 flex items-center gap-1">
-                Made with <Heart className="h-3 w-3 text-red-500" /> in Kumasi,
-                Ghana
+                Made by Velox Corporation (Codehumps)
               </p>
             </div>
           </div>
