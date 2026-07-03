@@ -258,14 +258,9 @@ export default function POSPage() {
       )}
 
       {/* Header */}
+      {/* Header */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex items-center gap-3">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs">
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </Button>
-          </Link>
           <div className="flex items-center gap-2">
             <div className="relative h-7 w-7 overflow-hidden rounded-md">
               <Image
@@ -283,6 +278,16 @@ export default function POSPage() {
               </span>
             </span>
           </div>
+
+          {/* Organization name */}
+          {me?.organization?.organizationName && (
+            <>
+              <div className="hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
+              <span className="hidden truncate text-xs font-medium text-zinc-600 dark:text-zinc-300 sm:block sm:max-w-[160px] lg:max-w-none">
+                {me.organization.organizationName}
+              </span>
+            </>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
