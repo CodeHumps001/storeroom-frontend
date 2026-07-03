@@ -114,9 +114,14 @@ export function StatsSection() {
             Growing every day
           </span>
           <h2 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-            {hasBusinesses
-              ? "Storeroom in numbers"
-              : "Be part of the beginning"}
+            {hasBusinesses ? (
+              <>
+                <span className="text-zinc-900">Store</span>
+                <span className="text-orange-500">room</span> in numbers
+              </>
+            ) : (
+              "Be part of the beginning"
+            )}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-zinc-500">
             {hasBusinesses
