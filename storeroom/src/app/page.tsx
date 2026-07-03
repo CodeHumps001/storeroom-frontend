@@ -655,7 +655,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── STATS ────────────────────────────────────────────────────────────── */}
-      <section className="border-y border-zinc-100 bg-white py-12">
+      <section className="border-y border-zinc-100 bg-white">
         <StatsSection />
       </section>
 
