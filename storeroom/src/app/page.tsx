@@ -46,6 +46,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import StatsSection from "@/components/shared/StatsCard";
 
 // ── Social Icons ──────────────────────────────────────────────────────────────
 const TwitterIcon = () => (
@@ -151,6 +152,42 @@ const heroImages = [
   {
     url: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?q=80&w=1400&auto=format&fit=crop",
     caption: "Pharmacy stock and product management made simple",
+  },
+];
+
+// ── Hero Slides (image + matching headline + paragraph) ────────────────────
+const heroSlides = [
+  {
+    url: "https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1400&auto=format&fit=crop",
+    caption: "Fast checkout for retail and supermarket businesses",
+    headlineTop: "Fast checkout for",
+    headlineAccent: "retail & supermarkets",
+    paragraph:
+      "Process sales in seconds, manage staff, and keep every shelf stocked — all from one platform built for Ghanaian shops.",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1400&auto=format&fit=crop",
+    caption: "Manage inventory and sales from one dashboard",
+    headlineTop: "One dashboard for",
+    headlineAccent: "inventory & sales",
+    paragraph:
+      "See stock levels, daily revenue, and top-selling products in real time. No spreadsheets, no guesswork.",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?q=80&w=1400&auto=format&fit=crop",
+    caption: "Electronics and mobile shops using Storeroom",
+    headlineTop: "Built for",
+    headlineAccent: "electronics & mobile shops",
+    paragraph:
+      "Track serial numbers, manage fast-moving stock, and know exactly what's selling — down to the last unit.",
+  },
+  {
+    url: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?q=80&w=1400&auto=format&fit=crop",
+    caption: "Pharmacy stock and product management made simple",
+    headlineTop: "Simple stock control for",
+    headlineAccent: "pharmacies",
+    paragraph:
+      "Keep accurate records of every product, track what's running low, and never turn a customer away again.",
   },
 ];
 
@@ -492,8 +529,8 @@ export default function LandingPage() {
               className="absolute inset-0"
             >
               <Image
-                src={heroImages[heroIndex].url}
-                alt={heroImages[heroIndex].caption}
+                src={heroSlides[heroIndex].url}
+                alt={heroSlides[heroIndex].caption}
                 fill
                 className="object-cover opacity-80"
                 priority
@@ -506,7 +543,7 @@ export default function LandingPage() {
 
         {/* Slide indicators */}
         <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-          {heroImages.map((_, i) => (
+          {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => setHeroIndex(i)}
@@ -521,7 +558,7 @@ export default function LandingPage() {
         {/* Prev/Next buttons */}
         <button
           onClick={() =>
-            setHeroIndex((i) => (i - 1 + heroImages.length) % heroImages.length)
+            setHeroIndex((i) => (i - 1 + heroSlides.length) % heroSlides.length)
           }
           className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
           aria-label="Previous slide"
@@ -529,7 +566,7 @@ export default function LandingPage() {
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
-          onClick={() => setHeroIndex((i) => (i + 1) % heroImages.length)}
+          onClick={() => setHeroIndex((i) => (i + 1) % heroSlides.length)}
           className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/10 p-2 text-white backdrop-blur-sm hover:bg-white/20"
           aria-label="Next slide"
         >
@@ -538,14 +575,7 @@ export default function LandingPage() {
 
         {/* Hero content */}
         <div className="relative z-10 mx-auto max-w-7xl px-4 py-32 sm:px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: { transition: { staggerChildren: 0.1 } },
-            }}
-            className="max-w-2xl"
-          >
+          <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -556,26 +586,28 @@ export default function LandingPage() {
               </span>
             </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl"
-            >
-              Smart inventory & POS for
-              <br />
-              <span className="text-orange-400">African businesses</span>
-            </motion.h1>
+            {/* Headline + paragraph — crossfades per slide */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={heroIndex}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.5 }}
+              >
+                <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  {heroSlides[heroIndex].headlineTop}
+                  <br />
+                  <span className="text-orange-400">
+                    {heroSlides[heroIndex].headlineAccent}
+                  </span>
+                </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mt-6 text-lg leading-relaxed text-white/80"
-            >
-              Track inventory, process sales, manage staff, and understand your
-              business all from one platform. Used by 500+ shops across Ghana.
-            </motion.p>
+                <p className="mt-6 text-lg leading-relaxed text-white/80">
+                  {heroSlides[heroIndex].paragraph}
+                </p>
+              </motion.div>
+            </AnimatePresence>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -618,29 +650,13 @@ export default function LandingPage() {
                 Cancel anytime
               </span>
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── STATS ────────────────────────────────────────────────────────────── */}
       <section className="border-y border-zinc-100 bg-white py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
-            {[
-              { number: "500+", label: "Active businesses" },
-              { number: "GHS 50M+", label: "Inventory tracked" },
-              { number: "98%", label: "Customer satisfaction" },
-              { number: "24/7", label: "Support available" },
-            ].map((stat, i) => (
-              <FadeIn key={i} delay={i * 0.1}>
-                <p className="text-3xl font-extrabold text-zinc-900">
-                  {stat.number}
-                </p>
-                <p className="mt-1 text-sm text-zinc-500">{stat.label}</p>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
+        <StatsSection />
       </section>
 
       {/* ── BUSINESS TYPES SECTION ──────────────────────────────────────────── */}
