@@ -1230,7 +1230,8 @@ export default function LandingPage() {
               Ready to grow your business?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-orange-100">
-              Join 3,500+ shop owners across Ghana who use Storeroom every day.
+              Be one of the first shop owners in Ghana to run your business on
+              Storeroom.
             </p>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Link href="/register">
