@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,7 @@ import {
   List,
   Phone,
   User,
+  ScanLine,
 } from "lucide-react";
 import Link from "next/link";
 import apiRequest from "@/lib/api";
@@ -33,6 +34,10 @@ import { useMe } from "@/hooks/Useme";
 import ProductGrid from "@/components/pos/ProductGrid";
 import ProductList from "@/components/pos/productList";
 import Image from "next/image";
+import ScanModal from "@/components/pos/ScanModal";
+import PairPhoneModal from "@/components/pos/PairPhoneModal";
+import { useScanReceiver } from "@/hooks/useScanReceiver";
+import { beep, resolveScan, CHANNEL_STORAGE_KEY } from "@/lib/scan";
 
 interface CartItem {
   product: Product;
@@ -78,6 +83,16 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
+  const [scanOpen, setScanOpen] = useState(false);
+  const [pairOpen, setPairOpen] = useState(false);
+  const [channel, setChannel] = useState<string | null>(null);
+  const productsRef = useRef(products);
+  productsRef.current = products;
+
+  // Restore this POS screen's phone-pairing code
+  useEffect(() => {
+    setChannel(localStorage.getItem(CHANNEL_STORAGE_KEY));
+  }, []);
 
   // Load saved view preference from localStorage
   useEffect(() => {
@@ -97,7 +112,8 @@ export default function POSPage() {
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+      p.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (p.barcode ?? "").includes(searchTerm);
     const matchesCategory =
       selectedCategory === "All" || p.category.name === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -143,6 +159,26 @@ export default function POSPage() {
 
   const removeItem = (productId: string) =>
     setCart((prev) => prev.filter((i) => i.product.id !== productId));
+
+  // Called for every scan: this device's camera, a paired phone, or a USB scanner
+  const handleScan = (raw: string) => {
+    const product = resolveScan(raw, productsRef.current);
+    if (!product) {
+      beep("error");
+      showToast("error", "No product matches that code");
+      return;
+    }
+    if (product.quantity <= 0) {
+      beep("error");
+      showToast("error", `${product.name} is out of stock`);
+      return;
+    }
+    addToCart(product);
+    beep("ok");
+    showToast("success", `Added ${product.name}`);
+  };
+
+  const { connected: phoneConnected } = useScanReceiver(channel, handleScan);
 
   const clearCart = () => {
     setCart([]);
@@ -242,7 +278,7 @@ export default function POSPage() {
       {/* Toast */}
       {toast && (
         <div
-          className={`fixed right-4 top-4 z-50 flex items-center gap-3 rounded-xl border px-4 py-3 shadow-xl ${
+          className={`fixed right-4 top-4 z-[70] flex items-center gap-3 rounded-xl border px-4 py-3 shadow-xl ${
             toast.type === "success"
               ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200"
               : "border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/60 dark:text-red-200"
@@ -298,6 +334,25 @@ export default function POSPage() {
           )}
 
           <button
+            onClick={() => setScanOpen(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-500 dark:border-zinc-700 dark:text-zinc-300"
+          >
+            <ScanLine className="h-4 w-4" />
+            Scan
+          </button>
+
+          <button
+            onClick={() => setPairOpen(true)}
+            className="hidden items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-500 dark:border-zinc-700 dark:text-zinc-300 lg:flex"
+          >
+            <Smartphone className="h-4 w-4" />
+            Pair phone
+            {phoneConnected && (
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            )}
+          </button>
+
+          <button
             onClick={() => setCartOpen(true)}
             className="relative flex items-center gap-1.5 rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white lg:hidden"
           >
@@ -326,6 +381,13 @@ export default function POSPage() {
                 placeholder={`Search ${products.length} products...`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  // USB barcode scanners type the code then press Enter
+                  if (e.key === "Enter" && resolveScan(searchTerm, products)) {
+                    handleScan(searchTerm);
+                    setSearchTerm("");
+                  }
+                }}
                 className="h-9 pl-9 text-sm"
               />
               {searchTerm && (
@@ -427,6 +489,19 @@ export default function POSPage() {
           />
         </div>
       </div>
+
+      <ScanModal
+        open={scanOpen}
+        onClose={() => setScanOpen(false)}
+        onScan={handleScan}
+      />
+      <PairPhoneModal
+        open={pairOpen}
+        onClose={() => setPairOpen(false)}
+        channel={channel}
+        onChannelChange={setChannel}
+        connected={phoneConnected}
+      />
 
       {/* Mobile Cart Drawer */}
       {cartOpen && (

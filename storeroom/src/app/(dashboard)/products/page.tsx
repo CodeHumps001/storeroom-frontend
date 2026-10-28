@@ -22,11 +22,15 @@ import {
   XCircle,
   Search,
   X,
+  QrCode,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AddProductForm from "@/components/forms/AddProductForm";
-import { useState } from "react";
+import ProductQRDialog from "@/components/products/ProductQRDialog";
+import BulkUpdateDialog from "@/components/products/BulkUpdateDialog";
+import { useRef, useState } from "react";
 import { Product } from "@/types";
 import apiRequest from "@/lib/api";
 import { useMe } from "@/hooks/Useme";
@@ -42,6 +46,9 @@ export default function ProductsPage() {
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
   const [toast, setToast] = useState<Toast>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [qrProducts, setQrProducts] = useState<Product[] | null>(null);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const bulkChanged = useRef(false);
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -79,9 +86,14 @@ export default function ProductsPage() {
   const isLimitReached =
     isFreeRestricted && currentProductCount >= productLimit;
 
-  // Filter products based on search
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  // Bulk update is an owner-only endpoint on the server
+  const isOwner = me?.role === "OWNER";
+
+  // Filter products based on search (name or barcode)
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.barcode ?? "").includes(searchTerm),
   );
 
   const totalValue = products.reduce(
@@ -192,14 +204,36 @@ export default function ProductsPage() {
             {products.length !== 1 ? "s" : ""} total
           </p>
         </div>
-        <Button
-          className="shrink-0 bg-black text-white hover:bg-orange-500 dark:bg-white dark:text-black dark:hover:bg-orange-500"
-          onClick={() => setIsOpen(true)}
-          disabled={isLimitReached}
-        >
-          <Package className="mr-2 h-4 w-4" />
-          Add product
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            className="shrink-0"
+            onClick={() => setQrProducts(products)}
+            disabled={products.length === 0}
+          >
+            <QrCode className="mr-2 h-4 w-4" />
+            Print QR labels
+          </Button>
+          {isOwner && (
+            <Button
+              variant="outline"
+              className="shrink-0"
+              onClick={() => setBulkOpen(true)}
+              disabled={products.length === 0}
+            >
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              Bulk update
+            </Button>
+          )}
+          <Button
+            className="shrink-0 bg-black text-white hover:bg-orange-500 dark:bg-white dark:text-black dark:hover:bg-orange-500"
+            onClick={() => setIsOpen(true)}
+            disabled={isLimitReached}
+          >
+            <Package className="mr-2 h-4 w-4" />
+            Add product
+          </Button>
+        </div>
       </div>
 
       {/* Product Limit Warning for FREE users */}
@@ -314,7 +348,7 @@ export default function ProductsPage() {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
               <Input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Search name or barcode..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9 pr-8"
@@ -398,6 +432,11 @@ export default function ProductsPage() {
                       >
                         <TableCell className="py-4 pl-6 font-medium text-zinc-900 dark:text-zinc-100">
                           {product.name}
+                          {product.barcode && (
+                            <span className="block font-mono text-[11px] font-normal text-zinc-400">
+                              {product.barcode}
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell>
                           <span className="inline-flex rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-950/30 dark:text-orange-400">
@@ -423,6 +462,15 @@ export default function ProductsPage() {
                         </TableCell>
                         <TableCell className="pr-6 text-right">
                           <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              title="Print QR label"
+                              onClick={() => setQrProducts([product])}
+                              className="h-8 w-8 p-0 text-zinc-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-950/20 dark:hover:text-orange-400"
+                            >
+                              <QrCode className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -474,6 +522,30 @@ export default function ProductsPage() {
           );
         }}
         product={selectedProduct || undefined}
+      />
+
+      <ProductQRDialog
+        open={qrProducts !== null}
+        onClose={() => setQrProducts(null)}
+        products={qrProducts ?? []}
+      />
+
+      {/* Refresh the list when the dialog CLOSES, not on success: fetchProducts()
+          swaps this page for a spinner, which would wipe the dialog's result screen. */}
+      <BulkUpdateDialog
+        open={bulkOpen}
+        onClose={() => {
+          setBulkOpen(false);
+          if (bulkChanged.current) {
+            bulkChanged.current = false;
+            fetchProducts();
+            showToast("success", "Products updated.");
+          }
+        }}
+        onSuccess={() => {
+          bulkChanged.current = true;
+        }}
+        products={products}
       />
     </div>
   );

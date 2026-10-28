@@ -32,7 +32,6 @@ interface AddProductFormProps {
 interface FormData {
   name: string;
   categoryId: string;
-  barcode: string;
   costPrice: string;
   sellingPrice: string;
   quantity: string;
@@ -53,7 +52,6 @@ export default function AddProductForm({
   const [formData, setFormData] = useState<FormData>({
     name: product?.name || "",
     categoryId: product?.categoryId || "",
-    barcode: product?.barcode || "",
     costPrice: product?.costPrice?.toString() || "",
     sellingPrice: product?.sellingPrice?.toString() || "",
     quantity: product?.quantity?.toString() || "",
@@ -77,7 +75,6 @@ export default function AddProductForm({
       setFormData({
         name: product.name,
         categoryId: product.categoryId || "",
-        barcode: product.barcode || "",
         costPrice: product.costPrice.toString(),
         sellingPrice: product.sellingPrice.toString(),
         quantity: product.quantity.toString(),
@@ -92,7 +89,6 @@ export default function AddProductForm({
     setFormData({
       name: "",
       categoryId: "",
-      barcode: "",
       costPrice: "",
       sellingPrice: "",
       quantity: "",
@@ -186,7 +182,6 @@ export default function AddProductForm({
       const submitData = new FormData();
       submitData.append("name", formData.name);
       submitData.append("categoryId", formData.categoryId);
-      submitData.append("barcode", formData.barcode);
       submitData.append("costPrice", formData.costPrice);
       submitData.append("sellingPrice", formData.sellingPrice);
       submitData.append("quantity", formData.quantity);
@@ -275,20 +270,13 @@ export default function AddProductForm({
             )}
           </div>
 
-          {/* Barcode */}
-          <div className="space-y-2">
-            <Label htmlFor="barcode" className="text-sm font-medium">
-              Barcode (Optional)
-            </Label>
-            <Input
-              id="barcode"
-              type="text"
-              placeholder="Enter barcode"
-              value={formData.barcode}
-              onChange={handleInputChange}
-              className="h-10"
-            />
-          </div>
+          {/* Barcode is generated automatically; shown read-only when editing */}
+          {product?.barcode && (
+            <div className="space-y-1">
+              <Label className="text-sm font-medium">Barcode</Label>
+              <p className="font-mono text-sm text-zinc-500">{product.barcode}</p>
+            </div>
+          )}
 
           {/* Cost Price & Selling Price */}
           <div className="grid gap-4 sm:grid-cols-2">
