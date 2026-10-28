@@ -15,7 +15,7 @@ type Entry = { id: number; ok: boolean; text: string };
  * Remember to allow /scan in your auth middleware / route protection.
  */
 export default function PhoneScannerPage() {
-  const { products, loading } = useProducts();
+  const { products, loading, error } = useProducts();
   const productsRef = useRef(products);
   productsRef.current = products;
 
@@ -37,7 +37,10 @@ export default function PhoneScannerPage() {
     const product = resolveScan(raw, productsRef.current);
     if (!product) {
       beep("error");
-      addLog(false, "Unknown code. It isn't one of your products.");
+      addLog(
+        false,
+        `Unknown code "${raw.slice(0, 40)}" (${productsRef.current.length} products loaded)`,
+      );
       return;
     }
     try {
@@ -69,6 +72,12 @@ export default function PhoneScannerPage() {
           Scanned items are added to the POS cart you paired with.
         </p>
       </header>
+
+      {error && (
+        <p className="rounded-xl bg-red-50 p-3 text-xs text-red-700 dark:bg-red-950/30 dark:text-red-300">
+          Could not load products: {error}. Scans cannot be matched until this is fixed (try logging in again on this phone).
+        </p>
+      )}
 
       {channel === null ? (
         <p className="rounded-xl bg-amber-50 p-4 text-sm text-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
