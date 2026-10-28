@@ -23,7 +23,6 @@ import {
   List,
   Phone,
   User,
-  ScanLine,
 } from "lucide-react";
 import Link from "next/link";
 import apiRequest from "@/lib/api";
@@ -33,9 +32,9 @@ import { Product } from "@/types";
 import { useMe } from "@/hooks/Useme";
 import ProductGrid from "@/components/pos/ProductGrid";
 import ProductList from "@/components/pos/productList";
-import Image from "next/image";
 import ScanModal from "@/components/pos/ScanModal";
 import PairPhoneModal from "@/components/pos/PairPhoneModal";
+import PosHeader from "@/components/pos/PosHeader";
 import { useScanReceiver } from "@/hooks/useScanReceiver";
 import { beep, resolveScan, CHANNEL_STORAGE_KEY } from "@/lib/scan";
 
@@ -293,79 +292,14 @@ export default function POSPage() {
         </div>
       )}
 
-      {/* Header */}
-      {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="relative h-7 w-7 overflow-hidden rounded-md">
-              <Image
-                src="/logo.jpeg"
-                alt="Storeroom Logo"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <span className="text-sm font-semibold">
-              <span className="text-black dark:text-white">Store</span>
-              <span className="text-orange-500">room</span>
-              <span className="ml-1 text-xs font-normal text-zinc-500">
-                POS
-              </span>
-            </span>
-          </div>
-
-          {/* Organization name */}
-          {me?.organization?.organizationName && (
-            <>
-              <div className="hidden h-5 w-px bg-zinc-200 dark:bg-zinc-800 sm:block" />
-              <span className="hidden truncate text-xs font-medium text-zinc-600 dark:text-zinc-300 sm:block sm:max-w-[160px] lg:max-w-none">
-                {me.organization.organizationName}
-              </span>
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          {me && (
-            <span className="hidden text-xs text-zinc-500 dark:text-zinc-400 sm:block">
-              {me.name} · {me.role}
-            </span>
-          )}
-
-          <button
-            onClick={() => setScanOpen(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-500 dark:border-zinc-700 dark:text-zinc-300"
-          >
-            <ScanLine className="h-4 w-4" />
-            Scan
-          </button>
-
-          <button
-            onClick={() => setPairOpen(true)}
-            className="hidden items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 hover:border-orange-400 hover:text-orange-500 dark:border-zinc-700 dark:text-zinc-300 lg:flex"
-          >
-            <Smartphone className="h-4 w-4" />
-            Pair phone
-            {phoneConnected && (
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            )}
-          </button>
-
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative flex items-center gap-1.5 rounded-lg bg-black px-3 py-1.5 text-xs font-medium text-white lg:hidden"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            {cart.length > 0 && (
-              <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold">
-                {cart.reduce((s, i) => s + i.quantity, 0)}
-              </span>
-            )}
-            Cart
-          </button>
-        </div>
-      </header>
+      <PosHeader
+        me={me}
+        cartCount={cart.reduce((sum, i) => sum + i.quantity, 0)}
+        phoneConnected={phoneConnected}
+        onScan={() => setScanOpen(true)}
+        onPairPhone={() => setPairOpen(true)}
+        onOpenCart={() => setCartOpen(true)}
+      />
 
       {/* Body */}
       <div className="flex flex-1 overflow-hidden">

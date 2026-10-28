@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import apiRequest from "@/lib/api";
 
-interface Me {
+export interface Me {
   id: string;
   name: string;
   email: string;
@@ -22,14 +24,25 @@ interface Me {
   };
 }
 
-const useMe = () => {
+export interface MeState {
+  me: Me | null;
+  loading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+}
+
+/** Filled by <AuthGuard>, so the whole page shares ONE /auth/me request. */
+export const MeContext = createContext<MeState | null>(null);
+
+export function useFetchMe(enabled = true): MeState {
   const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMe = async () => {
+  const fetchMe = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await apiRequest("/auth/me");
       setMe(response.data);
     } catch (err: any) {
@@ -37,13 +50,21 @@ const useMe = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchMe();
   }, []);
 
+  useEffect(() => {
+    if (enabled) fetchMe();
+  }, [enabled, fetchMe]);
+
   return { me, loading, error, refetch: fetchMe };
+}
+
+/** Same API as before. Inside an <AuthGuard> it reuses the shared result;
+ *  anywhere else it falls back to fetching on its own. */
+const useMe = (): MeState => {
+  const shared = useContext(MeContext);
+  const own = useFetchMe(shared === null);
+  return shared ?? own;
 };
 
 export { useMe };

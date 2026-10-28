@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getToken } from "@/lib/auth";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Menu, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import Sidebar from "@/components/shared/sidebar";
 import { useMe } from "@/hooks/Useme";
 import WhatsAppSupport from "@/components/shared/WhatsAppSupport";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -34,20 +34,19 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
+  return (
+    <AuthGuard>
+      <DashboardShell>{children}</DashboardShell>
+    </AuthGuard>
+  );
+}
+
+// Only renders after AuthGuard has confirmed the login and the role,
+// so the old "mounted" / token checks are no longer needed here.
+function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { me } = useMe();
-
-  // Hydration fix — only run client-side
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const token = getToken();
-    if (!token) router.push("/login");
-  }, [mounted]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -59,12 +58,6 @@ export default function DashboardLayout({
       document.body.style.overflow = "";
     };
   }, [sidebarOpen]);
-
-  // Don't render until client hydration is complete
-  if (!mounted) return null;
-
-  const token = getToken();
-  if (!token) return null;
 
   const pageTitle = pageTitles[pathname] ?? "Storeroom";
 

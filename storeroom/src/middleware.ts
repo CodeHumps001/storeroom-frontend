@@ -1,38 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  AUTH_PAGES,
+  PROTECTED_PREFIXES,
+  canAccess,
+  homeFor,
+  isRole,
+  matchesPrefix,
+} from "@/lib/roles";
+
+/** Reads the JWT payload (NOT verified; the backend verifies on every API call).
+ *  Only used to route people quickly; real protection stays on the server. */
+function readPayload(token: string): { role?: string; exp?: number } | null {
+  try {
+    const part = token.split(".")[1];
+    const json = atob(part.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
 
 export function middleware(request: NextRequest) {
-  // 1. Read the token from cookies (key: "token")
+  const { pathname, search } = request.nextUrl;
   const token = request.cookies.get("token")?.value;
-  // 2. Get the pathname from request.nextUrl
-  const pathname = request.nextUrl.pathname;
-  // 3. If no token and pathname starts with /dashboard, /products etc → redirect to /login
-  const protectedRoutes = [
-    "/products",
-    "/categories",
-    "/sales",
-    "/reports",
-    "/staff",
-    "/settings",
-  ];
+  const payload = token ? readPayload(token) : null;
+  const expired = !!payload?.exp && payload.exp * 1000 < Date.now();
+  const loggedIn = !!token && !expired;
+  const role = payload?.role; // undefined if your JWT has no role: client guard handles it
 
-  if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  const clearIfExpired = (res: NextResponse) => {
+    if (expired) res.cookies.delete("token");
+    return res;
+  };
+
+  // Login/register pages: send logged-in users to their own home
+  if (matchesPrefix(pathname, AUTH_PAGES)) {
+    if (loggedIn) {
+      return NextResponse.redirect(new URL(homeFor(role), request.url));
+    }
+    return clearIfExpired(NextResponse.next());
   }
-  // 4. If token exists and pathname is /login → redirect to /dashboard
-  if (token && pathname === "/login") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+
+  // Protected pages
+  if (matchesPrefix(pathname, PROTECTED_PREFIXES)) {
+    if (!loggedIn) {
+      const url = new URL("/login", request.url);
+      url.searchParams.set("next", pathname + search);
+      return clearIfExpired(NextResponse.redirect(url));
+    }
+    if (isRole(role) && !canAccess(role, pathname)) {
+      return NextResponse.redirect(new URL(homeFor(role), request.url));
+    }
   }
-  // 5. Otherwise → allow through with NextResponse.next()
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
+    "/login",
+    "/register",
+    "/dashboard/:path*",
     "/products/:path*",
     "/categories/:path*",
     "/sales/:path*",
     "/reports/:path*",
     "/staff/:path*",
     "/settings/:path*",
-  ], // which routes does middleware run on?
+    "/credits/:path*",
+    "/pos/:path*",
+    "/scan/:path*",
+  ],
 };

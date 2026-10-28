@@ -6,13 +6,15 @@ const getToken = () => {
 const saveToken = (token: string) => {
   if (typeof window === "undefined") return;
   localStorage.setItem("token", token);
-  document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax${secure}`;
 };
 
 const deleteToken = () => {
   if (typeof window === "undefined") return;
   localStorage.removeItem("token");
-  document.cookie = `token=; path=/; max-age=0`;
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `token=; path=/; max-age=0; SameSite=Lax${secure}`;
 };
 
 export { getToken, saveToken, deleteToken };
