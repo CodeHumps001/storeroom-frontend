@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   X,
   HandCoins,
+  TicketPercent,
 } from "lucide-react";
 import { deleteToken } from "@/lib/auth";
 import Image from "next/image";
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { href: "/reports", label: "Reports", icon: BarChart3 },
   { href: "/staff", label: "Staff", icon: Users },
   { href: "/credits", label: "Credits", icon: HandCoins },
+  { href: "/coupons", label: "Coupons", icon: TicketPercent},
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -18,6 +18,7 @@ const pageTitles: Record<string, string> = {
   "/reports": "Reports",
   "/staff": "Staff",
   "/settings": "Settings",
+  "/coupons": "Coupons",
 };
 
 function getInitials(name: string) {

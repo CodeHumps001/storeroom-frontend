@@ -23,6 +23,7 @@ import {
   List,
   Phone,
   User,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import apiRequest from "@/lib/api";
@@ -35,8 +36,13 @@ import ProductList from "@/components/pos/productList";
 import ScanModal from "@/components/pos/ScanModal";
 import PairPhoneModal from "@/components/pos/PairPhoneModal";
 import PosHeader from "@/components/pos/PosHeader";
+// import DiscountDialog, {
+//   AppliedDiscount,
+//   PricingPreview,
+// } from "/components/pos/DiscountDialog";
 import { useScanReceiver } from "@/hooks/useScanReceiver";
 import { beep, resolveScan, CHANNEL_STORAGE_KEY } from "@/lib/scan";
+import DiscountDialog, { AppliedDiscount, PricingPreview } from "@/components/pos/DiscountDialog";
 
 interface CartItem {
   product: Product;
@@ -82,6 +88,9 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [customerPhone, setCustomerPhone] = useState<string>("");
   const [customerName, setCustomerName] = useState<string>("");
+  const [discount, setDiscount] = useState<AppliedDiscount | null>(null);
+  const [pricing, setPricing] = useState<PricingPreview | null>(null);
+  const [discountOpen, setDiscountOpen] = useState(false);
   const [scanOpen, setScanOpen] = useState(false);
   const [pairOpen, setPairOpen] = useState(false);
   const [channel, setChannel] = useState<string | null>(null);
@@ -119,10 +128,16 @@ export default function POSPage() {
   });
 
   const categories = getUniqueCategories(products);
-  const total = cart.reduce(
+  const subtotal = cart.reduce(
     (sum, item) => sum + item.product.sellingPrice * item.quantity,
     0,
   );
+  const discountAmount = discount && pricing ? pricing.discountAmount : 0;
+  const total = Math.max(0, Math.round((subtotal - discountAmount) * 100) / 100);
+  const discountLabel =
+    pricing?.discountSource === "COUPON"
+      ? `Coupon ${pricing.couponCode}`
+      : "Discount";
   const paid = parseFloat(amountPaid) || 0;
   const change = paid >= total ? paid - total : 0;
   const isChargeDisabled = cart.length === 0 || paid < total || total === 0;
@@ -179,11 +194,53 @@ export default function POSPage() {
 
   const { connected: phoneConnected } = useScanReceiver(channel, handleScan);
 
+  const removeDiscount = () => {
+    setDiscount(null);
+    setPricing(null);
+  };
+
+  // The SERVER prices the cart and enforces the discount rules; this just shows its answer
+  useEffect(() => {
+    if (cart.length === 0) {
+      setDiscount(null);
+      setPricing(null);
+      return;
+    }
+    if (!discount) return;
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiRequest("/coupons/preview", {
+          method: "POST",
+          body: JSON.stringify({
+            items: cart.map((i) => ({ productId: i.product.id, quantity: i.quantity })),
+            couponCode: discount.couponCode,
+            manualDiscount: discount.manual,
+          }),
+        });
+        if (!cancelled) setPricing(res.data);
+      } catch (err: any) {
+        if (!cancelled) {
+          setDiscount(null);
+          setPricing(null);
+          showToast("error", err.message || "Discount no longer applies");
+        }
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart, discount]);
+
   const clearCart = () => {
     setCart([]);
     setAmountPaid("");
     setCustomerPhone("");
     setCustomerName("");
+    setDiscount(null);
+    setPricing(null);
   };
 
   const openReceipt = async (saleId: string) => {
@@ -237,6 +294,8 @@ export default function POSPage() {
           amountPaid: paid,
           customerPhone: customerPhone || undefined,
           customerName: customerName || undefined,
+          couponCode: discount?.couponCode,
+          manualDiscount: discount?.manual,
         }),
       });
       const saleId = response.data.id;
@@ -402,6 +461,11 @@ export default function POSPage() {
           <CartPanel
             cart={cart}
             total={total}
+            subtotal={subtotal}
+            discountAmount={discountAmount}
+            discountLabel={discountLabel}
+            onOpenDiscount={() => setDiscountOpen(true)}
+            onRemoveDiscount={removeDiscount}
             paid={paid}
             amountPaid={amountPaid}
             setAmountPaid={setAmountPaid}
@@ -437,6 +501,18 @@ export default function POSPage() {
         connected={phoneConnected}
       />
 
+      <DiscountDialog
+        open={discountOpen}
+        onClose={() => setDiscountOpen(false)}
+        items={cart.map((i) => ({ productId: i.product.id, quantity: i.quantity }))}
+        role={me?.role}
+        onApply={(d, p) => {
+          setDiscount(d);
+          setPricing(p);
+          showToast("success", "Discount applied");
+        }}
+      />
+
       {/* Mobile Cart Drawer */}
       {cartOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
@@ -458,6 +534,11 @@ export default function POSPage() {
               <CartPanel
                 cart={cart}
                 total={total}
+            subtotal={subtotal}
+            discountAmount={discountAmount}
+            discountLabel={discountLabel}
+            onOpenDiscount={() => setDiscountOpen(true)}
+            onRemoveDiscount={removeDiscount}
                 paid={paid}
                 amountPaid={amountPaid}
                 setAmountPaid={setAmountPaid}
@@ -490,6 +571,11 @@ export default function POSPage() {
 interface CartPanelProps {
   cart: CartItem[];
   total: number;
+  subtotal: number;
+  discountAmount: number;
+  discountLabel: string;
+  onOpenDiscount: () => void;
+  onRemoveDiscount: () => void;
   paid: number;
   amountPaid: string;
   setAmountPaid: (v: string) => void;
@@ -513,6 +599,11 @@ interface CartPanelProps {
 function CartPanel({
   cart,
   total,
+  subtotal,
+  discountAmount,
+  discountLabel,
+  onOpenDiscount,
+  onRemoveDiscount,
   paid,
   amountPaid,
   setAmountPaid,
@@ -645,6 +736,40 @@ function CartPanel({
             className="h-8 text-sm"
           />
         </div>
+
+        {/* Subtotal / discount */}
+        {cart.length > 0 && (
+          <div className="space-y-1.5 border-b border-zinc-100 px-4 py-3 text-sm dark:border-zinc-800">
+            <div className="flex justify-between text-zinc-500">
+              <span>Subtotal</span>
+              <span>GHS {subtotal.toFixed(2)}</span>
+            </div>
+            {discountAmount > 0 ? (
+              <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
+                <span className="flex items-center gap-1.5">
+                  <Tag className="h-3.5 w-3.5" />
+                  {discountLabel}
+                  <button
+                    onClick={onRemoveDiscount}
+                    className="text-zinc-400 hover:text-red-500"
+                    aria-label="Remove discount"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </span>
+                <span>- GHS {discountAmount.toFixed(2)}</span>
+              </div>
+            ) : (
+              <button
+                onClick={onOpenDiscount}
+                className="flex items-center gap-1.5 text-xs font-medium text-orange-500 hover:text-orange-600"
+              >
+                <Tag className="h-3.5 w-3.5" />
+                Add discount or coupon
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Total */}
         <div className="flex items-center justify-between px-4 py-3">

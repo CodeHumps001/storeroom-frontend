@@ -24,12 +24,14 @@ import {
   X,
   QrCode,
   FileSpreadsheet,
+  FileUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AddProductForm from "@/components/forms/AddProductForm";
 import ProductQRDialog from "@/components/products/ProductQRDialog";
 import BulkUpdateDialog from "@/components/products/BulkUpdateDialog";
+import BulkImportDialog from "@/components/products/BulkImportDialog";
 import { useRef, useState } from "react";
 import { Product } from "@/types";
 import apiRequest from "@/lib/api";
@@ -49,6 +51,8 @@ export default function ProductsPage() {
   const [qrProducts, setQrProducts] = useState<Product[] | null>(null);
   const [bulkOpen, setBulkOpen] = useState(false);
   const bulkChanged = useRef(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const importChanged = useRef(false);
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -214,6 +218,16 @@ export default function ProductsPage() {
             <QrCode className="mr-2 h-4 w-4" />
             Print QR labels
           </Button>
+          {isOwner && (
+            <Button
+              variant="outline"
+              className="shrink-0"
+              onClick={() => setImportOpen(true)}
+            >
+              <FileUp className="mr-2 h-4 w-4" />
+              Import
+            </Button>
+          )}
           {isOwner && (
             <Button
               variant="outline"
@@ -528,6 +542,22 @@ export default function ProductsPage() {
         open={qrProducts !== null}
         onClose={() => setQrProducts(null)}
         products={qrProducts ?? []}
+      />
+
+      <BulkImportDialog
+        open={importOpen}
+        onClose={() => {
+          setImportOpen(false);
+          if (importChanged.current) {
+            importChanged.current = false;
+            fetchProducts();
+            showToast("success", "Products imported.");
+          }
+        }}
+        onSuccess={() => {
+          importChanged.current = true;
+        }}
+        products={products}
       />
 
       {/* Refresh the list when the dialog CLOSES, not on success: fetchProducts()

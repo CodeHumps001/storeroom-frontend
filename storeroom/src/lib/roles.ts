@@ -26,6 +26,7 @@ export const PROTECTED_PREFIXES = [
   "/staff",
   "/settings",
   "/credits",
+  "/coupons",
   "/pos",
   "/scan",
 ];
